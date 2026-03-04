@@ -17,15 +17,19 @@
         }
 
         body{
-        height:100vh;
+        min-height:100vh;
         display:flex;
         justify-content:center;
         align-items:center;
         background:linear-gradient(120deg,#c7e6f2,#d6e8ff,#bff3e3);
+        padding:20px;
         }
+
+        /* LOGIN BOX */
 
         .login-container{
         width:480px;
+        max-width:100%;
         padding:50px;
         border-radius:15px;
         background:white;
@@ -35,7 +39,10 @@
 
         .login-container h2{
         margin-bottom:30px;
+        font-size:26px;
         }
+
+        /* INPUT */
 
         .input-group{
         margin-bottom:20px;
@@ -43,11 +50,15 @@
 
         .input-group input{
         width:100%;
-        padding:10px;
+        padding:12px;
         border:none;
         border-bottom:2px solid #333;
         outline:none;
+        font-size:15px;
+        background:transparent;
         }
+
+        /* BUTTONS */
 
         .btn-login{
         width:100%;
@@ -58,6 +69,7 @@
         cursor:pointer;
         border-radius:5px;
         margin-bottom:10px;
+        font-size:15px;
         }
 
         .btn-signup{
@@ -68,12 +80,18 @@
         color:white;
         cursor:pointer;
         border-radius:5px;
+        font-size:15px;
         }
+
+        /* ERROR */
 
         .error-msg{
         color:red;
         margin-bottom:10px;
+        font-size:14px;
         }
+
+        /* TEXT */
 
         .signup-text{
         margin-top:15px;
@@ -84,6 +102,53 @@
         color:#2d5c88;
         cursor:pointer;
         font-weight:bold;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        /* Tablet */
+
+        @media (max-width:768px){
+
+        .login-container{
+        padding:40px;
+        }
+
+        .login-container h2{
+        font-size:24px;
+        }
+
+        }
+
+        /* Mobile */
+
+        @media (max-width:480px){
+
+        body{
+        padding:15px;
+        }
+
+        .login-container{
+        padding:30px 25px;
+        border-radius:12px;
+        }
+
+        .login-container h2{
+        font-size:22px;
+        margin-bottom:25px;
+        }
+
+        .input-group input{
+        padding:10px;
+        font-size:14px;
+        }
+
+        .btn-login,
+        .btn-signup{
+        padding:11px;
+        font-size:14px;
+        }
+
         }
 
     </style>

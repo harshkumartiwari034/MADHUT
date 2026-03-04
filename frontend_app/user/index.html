@@ -4,54 +4,322 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MadHut | Premium T-Shirts</title>
+
     <link rel="icon" type="image/x-icon" href="../static/images/mad_hut.jpeg">
+
     <meta name="description" content="ShopMadHut - Premium T-Shirts Online">
-   <meta name="keywords" content="tshirt, fashion, shopmadhut, clothing">
-   <title>ShopMadHut - Premium T-Shirts</title>
+    <meta name="keywords" content="tshirt, fashion, shopmadhut, clothing">
 
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
-        body{background:#f8f9fa;display:flex;flex-direction:column;min-height:100vh;}
-        .main-content{flex:1;}
 
-        .header{display:flex;justify-content:space-between;align-items:center;padding:18px 60px;background:#111;color:white;}
-        .header nav a{color:white;text-decoration:none;margin-left:30px;font-size:14px;}
-        .header nav a:hover{color:#0fa36b;}
-        .logo{font-size:22px;font-weight:bold;}
-        .cart{font-size:14px;}
-        .auth-btn{margin-left:20px;cursor:pointer;}
-        .auth-btn:hover{color:#0fa36b;}
-
-        .container{display:flex;padding:40px 60px;gap:40px;}
-        .sidebar{width:250px;background:white;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.05);}
-        .sidebar button{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:6px;background:#111;color:white;cursor:pointer;}
-        .sidebar button:hover{background:#0fa36b;}
-
-        .products{flex:1;}
-        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:25px;}
-
-        .card{background:white;border-radius:15px;padding:15px;box-shadow:0 5px 15px rgba(0,0,0,0.05);}
-        .card img{width:100%;height:280px;object-fit:cover;border-radius:10px;}
-        .card h4{margin:12px 0 6px;font-size:15px;}
-        .price{color:#0fa36b;font-weight:bold;}
-        .old-price{text-decoration:line-through;color:gray;font-size:13px;margin-left:8px;}
-        .discount{font-size:12px;color:red;}
-        .add-btn{margin-top:12px;width:100%;padding:10px;border:none;border-radius:8px;background:#111;color:white;cursor:pointer;}
-        .add-btn:hover{background:#0fa36b;}
-
-        .pagination{text-align:center;margin-top:40px;}
-        .pagination button{padding:8px 14px;margin:4px;border:none;background:#ddd;border-radius:5px;cursor:pointer;}
-        .pagination button.active{background:#111;color:white;}
-
-        .footer{background:#111;color:white;padding:40px;text-align:center;margin-top:auto;}
-
-        .skeleton{background:#e0e0e0;border-radius:10px;animation:pulse 1.5s infinite;}
-        @keyframes pulse{
-            0%{opacity:1;}
-            50%{opacity:0.5;}
-            100%{opacity:1;}
+        *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Segoe UI',sans-serif;
         }
-        .skeleton-card{height:380px;}
+
+        body{
+        background:#f8f9fa;
+        display:flex;
+        flex-direction:column;
+        min-height:100vh;
+        }
+
+        .main-content{
+        flex:1;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:18px 60px;
+        background:#111;
+        color:white;
+        flex-wrap:wrap;
+        gap:10px;
+        }
+
+        .logo{
+        font-size:22px;
+        font-weight:bold;
+        }
+
+        .header nav{
+        display:flex;
+        flex-wrap:wrap;
+        }
+
+        .header nav a{
+        color:white;
+        text-decoration:none;
+        margin-left:30px;
+        font-size:14px;
+        }
+
+        .header nav a:hover{
+        color:#0fa36b;
+        }
+
+        .cart{
+        font-size:14px;
+        }
+
+        .auth-btn{
+        margin-left:20px;
+        cursor:pointer;
+        }
+
+        .auth-btn:hover{
+        color:#0fa36b;
+        }
+
+        /* ================= CONTAINER ================= */
+
+        .container{
+        display:flex;
+        padding:40px 60px;
+        gap:40px;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar{
+        width:250px;
+        background:white;
+        padding:25px;
+        border-radius:12px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.05);
+        height:fit-content;
+        }
+
+        .sidebar h3{
+        margin-bottom:15px;
+        }
+
+        .sidebar button{
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        border:none;
+        border-radius:6px;
+        background:#111;
+        color:white;
+        cursor:pointer;
+        }
+
+        .sidebar button:hover{
+        background:#0fa36b;
+        }
+
+        /* ================= PRODUCTS ================= */
+
+        .products{
+        flex:1;
+        }
+
+        .product-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+        gap:25px;
+        }
+
+        /* ================= CARD ================= */
+
+        .card{
+        background:white;
+        border-radius:15px;
+        padding:15px;
+        box-shadow:0 5px 15px rgba(0,0,0,0.05);
+        display:flex;
+        flex-direction:column;
+        }
+
+        .card img{
+        width:100%;
+        height:280px;
+        object-fit:cover;
+        border-radius:10px;
+        }
+
+        .card h4{
+        margin:12px 0 6px;
+        font-size:15px;
+        }
+
+        .price{
+        color:#0fa36b;
+        font-weight:bold;
+        }
+
+        .old-price{
+        text-decoration:line-through;
+        color:gray;
+        font-size:13px;
+        margin-left:8px;
+        }
+
+        .discount{
+        font-size:12px;
+        color:red;
+        }
+
+        .add-btn{
+        margin-top:auto;
+        width:100%;
+        padding:10px;
+        border:none;
+        border-radius:8px;
+        background:#111;
+        color:white;
+        cursor:pointer;
+        }
+
+        .add-btn:hover{
+        background:#0fa36b;
+        }
+
+        /* ================= PAGINATION ================= */
+
+        .pagination{
+        text-align:center;
+        margin-top:40px;
+        }
+
+        .pagination button{
+        padding:8px 14px;
+        margin:4px;
+        border:none;
+        background:#ddd;
+        border-radius:5px;
+        cursor:pointer;
+        }
+
+        .pagination button.active{
+        background:#111;
+        color:white;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer{
+        background:#111;
+        color:white;
+        padding:40px;
+        text-align:center;
+        margin-top:auto;
+        }
+
+        /* ================= SKELETON ================= */
+
+        .skeleton{
+        background:#e0e0e0;
+        border-radius:10px;
+        animation:pulse 1.5s infinite;
+        }
+
+        @keyframes pulse{
+        0%{opacity:1;}
+        50%{opacity:0.5;}
+        100%{opacity:1;}
+        }
+
+        .skeleton-card{
+        height:380px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        /* Tablet */
+
+        @media (max-width:1000px){
+
+        .container{
+        padding:30px;
+        gap:20px;
+        }
+
+        .header{
+        padding:15px 30px;
+        }
+
+        .sidebar{
+        width:200px;
+        }
+
+        }
+
+        /* Mobile */
+
+        @media (max-width:768px){
+
+        .header{
+        flex-direction:column;
+        align-items:flex-start;
+        }
+
+        .header nav{
+        margin-top:10px;
+        }
+
+        .header nav a{
+        margin-left:0;
+        margin-right:15px;
+        }
+
+        .container{
+        flex-direction:column;
+        padding:20px;
+        }
+
+        .sidebar{
+        width:100%;
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        }
+
+        .sidebar button{
+        flex:1;
+        margin:0;
+        }
+
+        .product-grid{
+        grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+        gap:15px;
+        }
+
+        .card img{
+        height:200px;
+        }
+
+        }
+
+        /* Small phones */
+
+        @media (max-width:480px){
+
+        .product-grid{
+        grid-template-columns:1fr 1fr;
+        }
+
+        .card img{
+        height:180px;
+        }
+
+        .header{
+        padding:15px;
+        }
+
+        .container{
+        padding:15px;
+        }
+
+        }
+
     </style>
 </head>
 
@@ -76,6 +344,7 @@
     </header>
 
     <section class="container">
+
         <div class="sidebar">
             <h3>Filter By Price</h3>
             <button onclick="applyFilter(0,500)">Under ₹500</button>
@@ -87,6 +356,7 @@
             <div id="tshirtContainer" class="product-grid"></div>
             <div id="pagination" class="pagination"></div>
         </div>
+
     </section>
 
 </div>
@@ -94,7 +364,6 @@
 <footer class="footer">
     © 2026 MadHut. All rights reserved.
 </footer>
-
 <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";

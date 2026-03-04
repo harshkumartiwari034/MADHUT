@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MadHut | Custom Checkout</title>
 
     <script>
@@ -24,127 +25,247 @@
     </script>
 
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-        body{background:#f1f3f6}
+
+        *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Segoe UI',sans-serif
+        }
+
+        body{
+        background:#f1f3f6;
+        }
 
         /* NAVBAR */
+
         .navbar{
-            background:#0f172a;
-            color:white;
-            padding:16px 40px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
+        background:#0f172a;
+        color:white;
+        padding:16px 40px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:10px;
         }
-        .nav-left{display:flex;gap:15px;align-items:center}
+
+        .nav-left{
+        display:flex;
+        gap:15px;
+        align-items:center;
+        }
+
         .back-btn{
-            background:#1e293b;
-            border:none;
-            padding:8px 14px;
-            color:white;
-            border-radius:6px;
-            cursor:pointer;
+        background:#1e293b;
+        border:none;
+        padding:8px 14px;
+        color:white;
+        border-radius:6px;
+        cursor:pointer;
         }
-        .back-btn:hover{background:#334155}
-        .brand{font-weight:700;font-size:18px}
+
+        .back-btn:hover{
+        background:#334155
+        }
+
+        .brand{
+        font-weight:700;
+        font-size:18px
+        }
 
         /* LAYOUT */
+
         .container{
-            max-width:1200px;
-            margin:40px auto;
-            display:grid;
-            grid-template-columns:2fr 1fr;
-            gap:25px;
-            padding:0 20px;
+        max-width:1200px;
+        margin:40px auto;
+        display:grid;
+        grid-template-columns:2fr 1fr;
+        gap:25px;
+        padding:0 20px;
         }
 
+        /* CARD */
+
         .card{
-            background:white;
-            padding:25px;
-            border-radius:16px;
-            box-shadow:0 8px 25px rgba(0,0,0,0.05);
+        background:white;
+        padding:25px;
+        border-radius:16px;
+        box-shadow:0 8px 25px rgba(0,0,0,0.05);
+        width:100%;
         }
 
         /* HEADINGS */
-        h2{margin-bottom:20px}
-        h3{margin:20px 0 10px}
+
+        h2{
+        margin-bottom:20px;
+        font-size:22px;
+        }
+
+        h3{
+        margin:20px 0 10px;
+        }
 
         /* UPLOAD */
+
         .upload-box{
-            border:2px dashed #cbd5e1;
-            height:220px;
-            border-radius:12px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            flex-direction:column;
-            cursor:pointer;
-            transition:0.3s;
+        border:2px dashed #cbd5e1;
+        height:220px;
+        border-radius:12px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        cursor:pointer;
+        transition:0.3s;
+        text-align:center;
+        padding:10px;
         }
-        .upload-box:hover{border-color:#0f172a}
-        .upload-box img{max-height:180px}
+
+        .upload-box:hover{
+        border-color:#0f172a
+        }
+
+        .upload-box img{
+        max-height:180px;
+        max-width:100%;
+        }
 
         /* FORM */
-        label{font-size:13px;margin-top:15px;display:block}
-        input,select{
-            width:100%;
-            padding:10px;
-            margin-top:6px;
-            border-radius:8px;
-            border:1px solid #ddd;
+
+        label{
+        font-size:13px;
+        margin-top:15px;
+        display:block;
         }
-        input:focus,select:focus{border-color:#111;outline:none}
+
+        input,select{
+        width:100%;
+        padding:10px;
+        margin-top:6px;
+        border-radius:8px;
+        border:1px solid #ddd;
+        font-size:14px;
+        }
+
+        input:focus,select:focus{
+        border-color:#111;
+        outline:none
+        }
 
         /* SIZE */
-        .size-group{display:flex;gap:10px;margin-top:10px}
-        .size-group button{
-            padding:8px 15px;
-            border:1px solid #ddd;
-            border-radius:6px;
-            background:white;
-            cursor:pointer;
+
+        .size-group{
+        display:flex;
+        gap:10px;
+        margin-top:10px;
+        flex-wrap:wrap;
         }
+
+        .size-group button{
+        padding:8px 15px;
+        border:1px solid #ddd;
+        border-radius:6px;
+        background:white;
+        cursor:pointer;
+        }
+
         .size-group .active{
-            background:#0f172a;
-            color:white;
+        background:#0f172a;
+        color:white;
         }
 
         /* SLIDER */
+
         input[type=range]{
-            width:100%;
-            margin-top:10px;
+        width:100%;
+        margin-top:10px;
         }
 
         /* SUMMARY */
+
         .summary-item{
-            display:flex;
-            justify-content:space-between;
-            margin-bottom:10px;
+        display:flex;
+        justify-content:space-between;
+        margin-bottom:10px;
+        font-size:14px;
         }
+
         .summary-total{
-            font-weight:700;
-            border-top:1px solid #eee;
-            padding-top:10px;
+        font-weight:700;
+        border-top:1px solid #eee;
+        padding-top:10px;
         }
 
         /* BUTTON */
+
         .place-btn{
-            width:100%;
-            padding:14px;
-            margin-top:20px;
-            background:#0f172a;
-            color:white;
-            border:none;
-            border-radius:8px;
-            font-weight:600;
-            cursor:pointer;
+        width:100%;
+        padding:14px;
+        margin-top:20px;
+        background:#0f172a;
+        color:white;
+        border:none;
+        border-radius:8px;
+        font-weight:600;
+        cursor:pointer;
+        font-size:15px;
         }
-        .place-btn:hover{background:#020617}
+
+        .place-btn:hover{
+        background:#020617
+        }
+
+        /* TABLET */
+
+        @media(max-width:1000px){
+
+        .container{
+        grid-template-columns:1fr;
+        }
+
+        .navbar{
+        padding:16px 20px;
+        }
+
+        }
 
         /* MOBILE */
-        @media(max-width:900px){
-            .container{grid-template-columns:1fr}
+
+        @media(max-width:600px){
+
+        .container{
+        margin:20px auto;
+        padding:0 15px;
         }
+
+        .card{
+        padding:20px;
+        }
+
+        .upload-box{
+        height:180px;
+        }
+
+        .brand{
+        font-size:16px;
+        }
+
+        .place-btn{
+        padding:12px;
+        }
+
+        .size-group{
+        gap:8px;
+        }
+
+        .size-group button{
+        padding:7px 12px;
+        font-size:13px;
+        }
+
+        }
+
     </style>
 </head>
 
@@ -155,12 +276,13 @@
         <button class="back-btn" onclick="goBack()">← Back</button>
         <div class="brand">MADHUT</div>
     </div>
-    <div>🔒 Secure Checkout</div>
+    <div>Secure Checkout</div>
 </div>
 
 <div class="container">
 
     <!-- LEFT -->
+
     <div class="card">
 
         <h2>Customise Your T-Shirt</h2>
@@ -180,6 +302,7 @@
         </select>
 
         <label>Size</label>
+
         <div class="size-group">
             <button data-size="S">S</button>
             <button data-size="M">M</button>
@@ -188,15 +311,18 @@
         </div>
 
         <label>Price</label>
+
         <input type="range" id="price" min="199" max="999" value="499">
         <div>₹<b id="priceValue">499</b></div>
 
         <label>Quantity</label>
+
         <input type="number" id="qty" value="1" min="1">
 
     </div>
 
     <!-- RIGHT -->
+
     <div class="card">
 
         <h2>Order Summary</h2>
@@ -217,6 +343,7 @@
         </div>
 
         <h3>Shipping Address</h3>
+
         <input id="fullName" placeholder="Full Name">
         <input id="phone" placeholder="Phone">
         <input id="address" placeholder="Address">
@@ -230,121 +357,176 @@
 </div>
 
 <script>
+
     let selectedSize="";
     let deliveryCharge=50;
     let isSubmitting=false;
 
     /* IMAGE */
+
     imageInput.onchange=function(){
-        const file=this.files[0];
-        if(file){
-            previewImg.src=URL.createObjectURL(file);
-            previewImg.style.display="block";
-            uploadText.style.display="none";
-        }
+    const file=this.files[0];
+
+    if(file){
+    previewImg.src=URL.createObjectURL(file);
+    previewImg.style.display="block";
+    uploadText.style.display="none";
+    }
     }
 
     /* SIZE */
+
     document.querySelectorAll(".size-group button").forEach(btn=>{
-        btn.onclick=function(){
-            document.querySelectorAll(".size-group button").forEach(b=>b.classList.remove("active"));
-            this.classList.add("active");
-            selectedSize=this.dataset.size;
-        }
+    btn.onclick=function(){
+
+    document.querySelectorAll(".size-group button").forEach(b=>b.classList.remove("active"));
+
+    this.classList.add("active");
+    selectedSize=this.dataset.size;
+
+    };
     });
 
     /* PRICE */
+
     function getPrice(){
-        return parseInt(price.value);
+    return parseInt(price.value);
     }
 
     price.oninput=function(){
-        priceValue.innerText=this.value;
-        updateTotal();
+
+    priceValue.innerText=this.value;
+    updateTotal();
+
     };
 
     qty.oninput=updateTotal;
 
     /* TOTAL */
+
     function updateTotal(){
-        const p=getPrice();
-        const q=parseInt(qty.value)||1;
 
-        const subtotal=p*q;
+    const p=getPrice();
+    const q=parseInt(qty.value)||1;
 
-        subtotalSpan = document.getElementById("subtotal");
-        totalSpan = document.getElementById("finalTotal");
+    const subtotal=p*q;
 
-        subtotalSpan.innerText=subtotal;
-        totalSpan.innerText=subtotal+deliveryCharge;
+    subtotalSpan=document.getElementById("subtotal");
+    totalSpan=document.getElementById("finalTotal");
+
+    subtotalSpan.innerText=subtotal;
+    totalSpan.innerText=subtotal+deliveryCharge;
+
     }
 
     /* VALIDATION */
+
     function validateForm(){
-        if(!imageInput.files[0]) return "Upload image";
-        if(!color.value) return "Select color";
-        if(!selectedSize) return "Select size";
-        if(!fullName.value || !phone.value || !address.value) return "Fill all fields";
-        return null;
+
+    if(!imageInput.files[0]) return "Upload image";
+
+    if(!color.value) return "Select color";
+
+    if(!selectedSize) return "Select size";
+
+    if(!fullName.value || !phone.value || !address.value) return "Fill all fields";
+
+    return null;
+
     }
 
     /* ORDER */
+
     async function placeOrder(){
-        if(isSubmitting) return;
 
-        const err=validateForm();
-        if(err){ alert(err); return; }
+    if(isSubmitting) return;
 
-        const token=getToken();
-        if(!token){ redirectToLogin(); return; }
+    const err=validateForm();
 
-        isSubmitting=true;
+    if(err){
+    alert(err);
+    return;
+    }
 
-        const btn=document.querySelector(".place-btn");
-        btn.innerText="Processing...";
-        btn.disabled=true;
+    const token=getToken();
 
-        const fd=new FormData();
-        fd.append("image",imageInput.files[0]);
-        fd.append("color",color.value);
-        fd.append("size",selectedSize);
-        fd.append("price",getPrice());
-        fd.append("quantity",qty.value);
-        fd.append("delivery_charge",deliveryCharge);
+    if(!token){
+    redirectToLogin();
+    return;
+    }
 
-        fd.append("fullName",fullName.value);
-        fd.append("phone",phone.value);
-        fd.append("address",address.value);
-        fd.append("city",city.value);
-        fd.append("pincode",pincode.value);
+    isSubmitting=true;
 
-        try{
-            const res=await fetch("https://madhut-5.onrender.com/user/order/customised/product",{
-                method:"POST",
-                headers:{ "Authorization":"Bearer "+token },
-                body:fd
-            });
+    const btn=document.querySelector(".place-btn");
 
-            if(res.status===401){ redirectToLogin(); return; }
+    btn.innerText="Processing...";
+    btn.disabled=true;
 
-            const data=await res.json();
-            if(!res.ok){ alert(data.message); return; }
+    const fd=new FormData();
 
-            alert("Order placed successfully!");
-            window.location.href="index.html";
+    fd.append("image",imageInput.files[0]);
+    fd.append("color",color.value);
+    fd.append("size",selectedSize);
+    fd.append("price",getPrice());
+    fd.append("quantity",qty.value);
+    fd.append("delivery_charge",deliveryCharge);
 
-        }catch{
-            alert("Server error");
-        }finally{
-            isSubmitting=false;
-            btn.innerText="Place Order";
-            btn.disabled=false;
-        }
+    fd.append("fullName",fullName.value);
+    fd.append("phone",phone.value);
+    fd.append("address",address.value);
+    fd.append("city",city.value);
+    fd.append("pincode",pincode.value);
+
+    try{
+
+    const res=await fetch("https://madhut-5.onrender.com/user/order/customised/product",{
+
+    method:"POST",
+    headers:{
+    "Authorization":"Bearer "+token
+    },
+    body:fd
+
+    });
+
+    if(res.status===401){
+    redirectToLogin();
+    return;
+    }
+
+    const data=await res.json();
+
+    if(!res.ok){
+    alert(data.message);
+    return;
+    }
+
+    alert("Order placed successfully!");
+
+    window.location.href="index.html";
+
+    }catch{
+
+    alert("Server error");
+
+    }finally{
+
+    isSubmitting=false;
+
+    btn.innerText="Place Order";
+
+    btn.disabled=false;
+
+    }
+
     }
 
     /* INIT */
+
     priceValue.innerText=getPrice();
+
     updateTotal();
+
 </script>
 
 </body>

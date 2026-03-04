@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MadHut | User Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
 
@@ -31,6 +32,7 @@
         justify-content:space-between;
         padding:0 30px;
         box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        flex-wrap:wrap;
         }
 
         .logo{
@@ -80,10 +82,11 @@
         100%{transform:rotate(360deg);}
         }
 
-        /* CARD */
+        /* PROFILE CARD */
 
         .profile-card{
         width:480px;
+        max-width:100%;
         background:white;
         border-radius:18px;
         box-shadow:0 15px 40px rgba(0,0,0,0.12);
@@ -114,12 +117,15 @@
         padding:35px;
         }
 
+        /* ROW */
+
         .profile-row{
         display:flex;
         justify-content:space-between;
         align-items:center;
         padding:14px 0;
         border-bottom:1px solid #f0f0f0;
+        gap:10px;
         }
 
         .profile-row span:first-child{
@@ -155,6 +161,74 @@
         .save-btn{background:#3f72af;display:none;}
         .logout-btn{background:#ef4444;}
 
+        /* ================= RESPONSIVE ================= */
+
+        /* Tablet */
+
+        @media (max-width:768px){
+
+        .profile-body{
+        padding:25px;
+        }
+
+        .profile-row input{
+        width:150px;
+        }
+
+        }
+
+        /* Mobile */
+
+        @media (max-width:500px){
+
+        .navbar{
+        padding:0 15px;
+        height:auto;
+        padding-top:12px;
+        padding-bottom:12px;
+        }
+
+        .logo{
+        font-size:18px;
+        }
+
+        .page{
+        padding:30px 15px;
+        }
+
+        .profile-card{
+        border-radius:14px;
+        }
+
+        .profile-header{
+        padding:30px 15px;
+        }
+
+        .profile-header img{
+        width:75px;
+        height:75px;
+        }
+
+        .profile-body{
+        padding:20px;
+        }
+
+        .profile-row{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+        }
+
+        .profile-row input{
+        width:100%;
+        }
+
+        .profile-actions{
+        flex-direction:column;
+        }
+
+        }
+
     </style>
 </head>
 
@@ -167,12 +241,10 @@
 
 <div class="page">
 
-    <!-- LOADER -->
     <div class="loader" id="loader">
         <div class="spinner"></div>
     </div>
 
-    <!-- PROFILE -->
     <div class="profile-card" id="profileCard">
 
         <div class="profile-header">
@@ -243,8 +315,6 @@
     const app=initializeApp(firebaseConfig);
     const auth=getAuth(app);
 
-    /* AUTH CHECK */
-
     onAuthStateChanged(auth,(user)=>{
 
     if(!user){
@@ -254,7 +324,6 @@
     }
 
     });
-
 
     async function loadProfile(){
 
@@ -281,7 +350,6 @@
 
     }
 
-
     function renderProfile(data){
 
     username.innerText=data.username;
@@ -295,18 +363,10 @@
     userid.innerText=data.unique_id;
     role.innerText=data.role;
 
-    /* HIDE LOADER */
-
     document.getElementById("loader").style.display="none";
-
-    /* SHOW CARD */
-
     document.getElementById("profileCard").style.display="block";
 
     }
-
-
-    /* EDIT */
 
     window.enableEdit=function(){
 
@@ -319,9 +379,6 @@
     editBtn.style.display="none";
 
     }
-
-
-    /* SAVE */
 
     window.saveProfile=async function(){
 
@@ -360,9 +417,6 @@
     }
 
     }
-
-
-    /* LOGOUT */
 
     window.logout=function(){
 

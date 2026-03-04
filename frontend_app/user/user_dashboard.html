@@ -15,7 +15,7 @@
 
         body{
         background:linear-gradient(135deg,#eef2f7,#f8fafc);
-        min-height:200vh;
+        min-height:100vh;
         }
 
         /* NAVBAR */
@@ -31,6 +31,7 @@
         justify-content:space-between;
         padding:0 30px;
         box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        flex-wrap:wrap;
         }
 
         .logo{
@@ -63,10 +64,11 @@
         justify-content:center;
         }
 
-        /* DASHBOARD CARD */
+        /* DASHBOARD */
 
         .dashboard{
         width:750px;
+        max-width:100%;
         background:white;
         border-radius:20px;
         box-shadow:0 15px 40px rgba(0,0,0,0.1);
@@ -120,7 +122,7 @@
         color:#64748b;
         }
 
-        /* LOGOUT BUTTON */
+        /* LOGOUT */
 
         .logout{
         margin-top:35px;
@@ -137,6 +139,70 @@
 
         .logout:hover{
         background:#dc2626;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        /* Tablet */
+
+        @media (max-width:900px){
+
+        .dashboard{
+        padding:30px;
+        }
+
+        .grid{
+        gap:20px;
+        }
+
+        .card{
+        padding:25px;
+        }
+
+        }
+
+        /* Mobile */
+
+        @media (max-width:600px){
+
+        .navbar{
+        padding:0 15px;
+        height:auto;
+        padding-top:12px;
+        padding-bottom:12px;
+        }
+
+        .logo{
+        font-size:18px;
+        }
+
+        .container{
+        padding:30px 15px;
+        }
+
+        .dashboard{
+        padding:25px;
+        border-radius:16px;
+        }
+
+        .dashboard h1{
+        font-size:22px;
+        margin-bottom:25px;
+        }
+
+        .grid{
+        grid-template-columns:1fr;
+        gap:15px;
+        }
+
+        .card{
+        padding:22px;
+        }
+
+        .card-icon{
+        font-size:30px;
+        }
+
         }
 
     </style>
@@ -207,7 +273,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-
     const firebaseConfig = {
     apiKey: "AIzaSyAIqeoNVZaz6XXJRT71ODhreTR-WsmVyXY",
     authDomain: "madhut-97c1e.firebaseapp.com",
@@ -220,7 +285,6 @@
 
     const token = localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
 
-
     /* SECURITY CHECK */
 
     onAuthStateChanged(auth,(user)=>{
@@ -230,7 +294,6 @@
     }
 
     });
-
 
     /* NAVIGATION */
 
@@ -257,7 +320,6 @@
     window.goSettings=function(){
     window.location.href="settings.html";
     }
-
 
     /* LOGOUT */
 

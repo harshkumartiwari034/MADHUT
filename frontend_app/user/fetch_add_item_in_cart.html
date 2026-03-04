@@ -57,8 +57,7 @@
         background:#ddd;
         }
 
-
-        /* PREMIUM TOAST */
+        /* TOAST */
 
         .toast{
         position:fixed;
@@ -91,7 +90,6 @@
         font-weight:500;
         }
 
-
         /* MAIN */
 
         .container{
@@ -112,7 +110,7 @@
         font-weight:600;
         }
 
-        /* CART */
+        /* CART LAYOUT */
 
         .cart-layout{
         display:flex;
@@ -122,6 +120,8 @@
         .cart-section{
         flex:2;
         }
+
+        /* CART ITEM */
 
         .cart-item{
         display:flex;
@@ -254,6 +254,92 @@
         font-size:18px;
         }
 
+        /* ========================= */
+        /* RESPONSIVE DESIGN */
+        /* ========================= */
+
+        @media (max-width:1000px){
+
+        .container{
+        padding:25px;
+        }
+
+        .cart-layout{
+        flex-direction:column;
+        }
+
+        .summary-box{
+        position:relative;
+        top:0;
+        }
+
+        }
+
+        @media (max-width:700px){
+
+        .navbar{
+        padding:15px 20px;
+        }
+
+        .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+        }
+
+        .cart-item{
+        flex-direction:column;
+        align-items:flex-start;
+        }
+
+        .cart-img{
+        width:100%;
+        margin:0 0 15px 0;
+        }
+
+        .cart-img img{
+        width:100%;
+        }
+
+        .action-buttons{
+        width:100%;
+        flex-direction:row;
+        justify-content:space-between;
+        margin-top:15px;
+        }
+
+        .remove-btn,
+        .buy-btn-small{
+        flex:1;
+        }
+
+        .qty-box{
+        margin-top:8px;
+        }
+
+        }
+
+        @media (max-width:480px){
+
+        .container{
+        padding:15px;
+        }
+
+        .page-title{
+        font-size:22px;
+        }
+
+        .buy-btn{
+        padding:12px;
+        font-size:15px;
+        }
+
+        .cart-item{
+        padding:15px;
+        }
+
+        }
+
     </style>
 
 </head>
@@ -338,9 +424,6 @@
 
     let cartData = null
 
-
-    /* BETTER BACK BUTTON */
-
     function goBack(){
 
     if(window.history.length > 1){
@@ -350,9 +433,6 @@
     }
 
     }
-
-
-    /* TOAST */
 
     function showToast(message){
 
@@ -368,9 +448,6 @@
     },3000)
 
     }
-
-
-    /* LOAD CART */
 
     async function loadCart(){
 
@@ -400,9 +477,6 @@
     }
 
     }
-
-
-    /* RENDER CART */
 
     function renderCart(data){
 
@@ -482,9 +556,6 @@
 
     }
 
-
-    /* UPDATE QTY */
-
     function updateQty(index,change){
 
     let item = cartData.items[index]
@@ -498,9 +569,6 @@
     renderCart(cartData)
 
     }
-
-
-    /* REMOVE ITEM */
 
     function removeItem(cartId){
 
