@@ -12,6 +12,8 @@ import os
 import json
 import firebase_admin
 from firebase_admin import credentials
+
+
 # from .extensions import limiter
 
 
@@ -41,6 +43,8 @@ def create_app():
             r"/*": {
                 "origins": [
                     "https://www.shopmadhut.com",
+                    "https://shopmadhut.com",
+                    "https://mad-hut.vercel.app",
                     "http://localhost:63342"
                 ]
             }
