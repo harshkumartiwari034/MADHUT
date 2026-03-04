@@ -40,6 +40,7 @@ def create_app():
         resources={
             r"/*": {
                 "origins": [
+                    "https://www.shopmadhut.com",
                     "http://localhost:63342"
                 ]
             }
