@@ -47,6 +47,7 @@ def create_app():
                     "https://shopmadhut.com",
                     "https://mad-hut.vercel.app",
                     "http://localhost:63342"
+                    "https://mad-hut-5pse.vercel.app"
                 ]
             }
         },
