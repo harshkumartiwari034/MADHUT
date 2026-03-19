@@ -70,7 +70,6 @@ class add_product(MethodView):
                 return jsonify({"error": "Only JPG and PNG allowed"}), 400
             upload_result = cloudinary.uploader.upload(file)
             images_urls.append(upload_result['secure_url'])
-
         name = data['name']
         description = data['description']
         price = data['price']

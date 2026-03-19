@@ -18,6 +18,7 @@ class OrderTshirt:
 
     def create_order_index(self):
         self.collection.create_index("order_id", unique=True)
+        self.collection.create_index("email")
         self.collection.create_index("user_id")
         self.collection.create_index("order_status")
         self.collection.create_index("created_at")
@@ -66,3 +67,8 @@ class OrderTshirt:
         }
         self.collection.insert_one(order_data)
         return {"success": True, "order_id": order_data["order_id"]}
+
+    def fetch_all_order(self, email):
+        order_data = self.collection.find({'email': email})
+        order_data['_id'] = str(order_data.get("_id"))
+

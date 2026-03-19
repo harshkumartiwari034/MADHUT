@@ -186,6 +186,22 @@
                 align-items:flex-start;
             }
         }
+        .success{
+            color:#16a34a;
+            background:#ecfdf5;
+            padding:10px;
+            border-radius:6px;
+            margin-top:15px;
+            font-weight:500;
+        }
+
+        .error{
+            color:#dc2626;
+            background:#fef2f2;
+            padding:10px;
+            border-radius:6px;
+            margin-top:15px;
+        }
     </style>
 </head>
 
@@ -305,80 +321,154 @@
 </div>
 
 <script>
+
     function previewImage(input, previewId, boxId) {
+
         const file = input.files[0];
         const preview = document.getElementById(previewId);
         const box = document.getElementById(boxId);
 
         if (file) {
+
             const reader = new FileReader();
-            reader.onload = e => {
+
+            reader.onload = function(e){
                 preview.src = e.target.result;
                 box.classList.add("has-image");
-            };
+            }
+
             reader.readAsDataURL(file);
         }
+
     }
 
-    for (let i = 1; i <= 5; i++) {
+    // image preview
+    for(let i=1;i<=5;i++){
+
         document.getElementById(`img${i}`)
-            .addEventListener("change", function() {
-                previewImage(this, `preview${i}`, `box${i}`);
-            });
+            .addEventListener("change",function(){
+                previewImage(this,`preview${i}`,`box${i}`)
+            })
+
     }
 
-    document.getElementById("productForm").addEventListener("submit", async function(e) {
+    const form = document.getElementById("productForm");
+    const button = document.querySelector("#productForm button");
+    const messageDiv = document.getElementById("message");
+
+
+    form.addEventListener("submit", async function(e){
+
         e.preventDefault();
+
+        // clear old message
+        messageDiv.innerHTML = "";
+
+        // disable button
+        button.disabled = true;
+        button.innerText = "Uploading...";
 
         const formData = new FormData();
 
-        formData.append("name", name.value);
-        formData.append("description", description.value);
-        formData.append("price", price.value);
-        formData.append("old_price", old_price.value);
-        formData.append("stock", stock.value);
-        formData.append("category", category.value);
+        formData.append("name", document.getElementById("name").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("price", document.getElementById("price").value);
+        formData.append("old_price", document.getElementById("old_price").value);
+        formData.append("stock", document.getElementById("stock").value);
+        formData.append("category", document.getElementById("category").value);
 
-        const sizes = [];
-        document.querySelectorAll("input[type='checkbox']:checked").forEach(cb => {
-            sizes.push(cb.value);
+        document.querySelectorAll("input[type='checkbox']:checked").forEach(cb=>{
+            formData.append("sizes", cb.value);
         });
-        sizes.forEach(size => formData.append("sizes", size));
 
-        const colorsArray = colors.value.split(",").map(c => c.trim()).filter(c => c);
-        colorsArray.forEach(color => formData.append("colors", color));
+        const colors = document.getElementById("colors").value
+            .split(",")
+            .map(c=>c.trim())
+            .filter(c=>c);
 
-        const tagsArray = tags.value.split(",").map(t => t.trim()).filter(t => t);
-        tagsArray.forEach(tag => formData.append("tags", tag));
+        colors.forEach(color=>{
+            formData.append("colors",color);
+        });
 
-        for (let i = 1; i <= 5; i++) {
+        const tags = document.getElementById("tags").value
+            .split(",")
+            .map(t=>t.trim())
+            .filter(t=>t);
+
+        tags.forEach(tag=>{
+            formData.append("tags",tag);
+        });
+
+        for(let i=1;i<=5;i++){
+
             const file = document.getElementById(`img${i}`).files[0];
-            if (file) formData.append("images", file);
-        }
 
-        try {
-            const res = await fetch("https://madhut-5.onrender.com/admin/add-product", {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await res.json();
-            message.innerHTML = `<p class="success">${data.message || "Product Added Successfully"}</p>`;
-            productForm.reset();
-
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById(`preview${i}`).src = "";
-                document.getElementById(`box${i}`).classList.remove("has-image");
+            if(file){
+                formData.append("images",file);
             }
 
-        } catch (err) {
-            message.innerHTML = `<p class="error">Something went wrong</p>`;
         }
+
+        try{
+
+            const response = await fetch("http://127.0.0.1:5000/admin/add-product",{
+                method:"POST",
+                body:formData
+            });
+
+            const data = await response.json();
+
+            if(response.ok){
+
+                messageDiv.innerHTML =
+                `<p class="success">✔ ${data.message}</p>`;
+
+                form.reset();
+
+                // reset image preview
+                for(let i=1;i<=5;i++){
+
+                    document.getElementById(`preview${i}`).src="";
+                    document.getElementById(`box${i}`).classList.remove("has-image");
+
+                }
+
+                // auto remove message after 3 sec
+                setTimeout(()=>{
+                    messageDiv.innerHTML="";
+                },3000);
+
+            }
+            else{
+
+                messageDiv.innerHTML =
+                `<p class="error"> ${data.error || "Upload failed"}</p>`;
+
+            }
+
+        }
+        catch(err){
+
+            console.error(err);
+
+            messageDiv.innerHTML =
+            `<p class="error">Server connection failed</p>`;
+
+        }
+        finally{
+
+            button.disabled = false;
+            button.innerText = "Add Product";
+
+        }
+
     });
+
 
     function goBack(){
         window.location.href = "index.html";
     }
+
 </script>
 
 </body>

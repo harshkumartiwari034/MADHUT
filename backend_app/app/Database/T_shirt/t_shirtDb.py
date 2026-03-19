@@ -21,7 +21,7 @@ class TshirtDatabase:
         result = self.collection.insert_one(product_data)
         product_data['_id'] = str(result.inserted_id)
 
-        return {"message": 'Product added successfully'}, 201
+        return {"message": 'Product added successfully',"success":True}, 201
 
     def fetch_product(self, page, limit, min_price=None, max_price=None):
         skip = (page - 1) * limit
