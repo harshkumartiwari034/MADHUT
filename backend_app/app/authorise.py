@@ -9,5 +9,5 @@ def get_current_user():
 
     token = auth_header.split(" ")[1]
 
-    decoded = firebase_auth.verify_id_token(token)
+    decoded = firebase_auth.verify_id_token(token, clock_skew_seconds=10)
     return decoded.get("email")

@@ -10,6 +10,8 @@ from .user_profile import blp as UserProfileBlueprint
 from .edit_profile import blp as EditProfileBlueprint
 from .fetch_item_in_cart import blp as FetchItemInCartBlueprint
 from .remove_item_add_in_cart import blp as RemoveItemAddToCartBlueprint
+from .fetch_order import blp as FetchAllOrder
+from .get_recent_product import blp as GetRecentProductBlueprint
 
 
 def register_user_blueprint(app_api):
@@ -25,3 +27,5 @@ def register_user_blueprint(app_api):
     app_api.register_blueprint(EditProfileBlueprint)
     app_api.register_blueprint(FetchItemInCartBlueprint)
     app_api.register_blueprint(RemoveItemAddToCartBlueprint)
+    app_api.register_blueprint(FetchAllOrder)
+    app_api.register_blueprint(GetRecentProductBlueprint)

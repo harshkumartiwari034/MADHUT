@@ -60,7 +60,7 @@ class OrderTshirt:
 
             "payment_mode": data["payment_mode"],
             "payment_status": "pending",
-            "order_status": "placed",
+            "order_status": "pending",
 
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow()
@@ -69,6 +69,10 @@ class OrderTshirt:
         return {"success": True, "order_id": order_data["order_id"]}
 
     def fetch_all_order(self, email):
-        order_data = self.collection.find({'email': email})
-        order_data['_id'] = str(order_data.get("_id"))
-
+        order_data = self.collection.find({'user_email': email})
+        order_data_list = []
+        for order in order_data:
+            order['_id'] = str(order.get("_id"))
+            order['items'][0]['product_id'] = str(order['items'][0]["product_id"])
+            order_data_list.append(order)
+        return order_data_list

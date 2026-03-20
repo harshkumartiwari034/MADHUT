@@ -1,6 +1,7 @@
 from bson import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
+import random
 
 
 class TshirtDatabase:
@@ -17,43 +18,41 @@ class TshirtDatabase:
                         'tags': tags,
                         'slugs': slug, 'discount_percent': discount_percent, 'is_active': True, 'is_featured': False,
                         'created_at': datetime.utcnow(),
-                        'updated_at': datetime.utcnow()}
+                        'updated_at': datetime.utcnow(),
+                        'random': random.random()}
         result = self.collection.insert_one(product_data)
         product_data['_id'] = str(result.inserted_id)
 
-        return {"message": 'Product added successfully',"success":True}, 201
+        return {"message": 'Product added successfully', "success": True}, 201
 
-    def fetch_product(self, page, limit, min_price=None, max_price=None):
+    def fetch_products(self, page, limit):
         skip = (page - 1) * limit
-
         query = {}
 
-        if min_price is not None and max_price is not None:
-            query['price'] = {'$gte': min_price, '$lte': max_price}
 
-        # 🔥 Only required fields
         projection = {
             "name": 1,
             "price": 1,
             "old_price": 1,
-            "images": {"$slice": 1},  # only first image
+            "images": {"$slice": 1},
         }
 
         datas = (
             self.collection
             .find(query, projection)
+            .sort("random", 1)
             .skip(skip)
             .limit(limit)
         )
 
         product_list = []
-
         for data in datas:
             data['_id'] = str(data.get("_id"))
             product_list.append(data)
 
         total_products = self.collection.count_documents(query)
         total_pages = (total_products + limit - 1) // limit
+
         return {
             'products': product_list,
             'total_pages': total_pages
@@ -64,12 +63,27 @@ class TshirtDatabase:
         detail["_id"] = str(detail.get('_id'))
         return detail
 
-    def update_stock(self, product_id, quantity):
-        # print(product_id, quantity)
-        stock_update = self.collection.update_one(
-            {
-                "_id": product_id,
-                "stock": {"$gte": quantity}
-            },
-            {"$inc": {'stock': -quantity}}
-        )
+    def fetch_new_arrival(self, page, limit):
+        skip = (page - 1) * limit
+        projection = {
+            'name': 1,
+            'price': 1,
+            'old': 1,
+            "images": {"$slice": 1}
+        }
+        datas = (self.collection.find({}, projection).sort("created_at", -1).skip(skip).limit(limit))
+        product_list = []
+        for data in datas:
+            data["_id"] = str(data.get("_id"))
+            product_list.append(data)
+        return {'products': product_list}
+
+    # def update_stock(self, product_id, quantity):
+    #     # print(product_id, quantity)
+    #     stock_update = self.collection.update_one(
+    #         {
+    #             "_id": product_id,
+    #             "stock": {"$gte": quantity}
+    #         },
+    #         {"$inc": {'stock': -quantity}}
+    #     )
