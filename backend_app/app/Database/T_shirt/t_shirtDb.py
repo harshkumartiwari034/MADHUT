@@ -78,12 +78,12 @@ class TshirtDatabase:
             product_list.append(data)
         return {'products': product_list}
 
-    # def update_stock(self, product_id, quantity):
-    #     # print(product_id, quantity)
-    #     stock_update = self.collection.update_one(
-    #         {
-    #             "_id": product_id,
-    #             "stock": {"$gte": quantity}
-    #         },
-    #         {"$inc": {'stock': -quantity}}
-    #     )
+    def update_stock(self, product_id, quantity):
+        # print(product_id, quantity)
+        stock_update = self.collection.update_one(
+            {
+                "_id": product_id,
+                "stock": {"$gte": quantity}
+            },
+            {"$inc": {'stock': -quantity}}
+        )
