@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MadHut - New Arrivals</title>
+
+    <style>
+        body{
+            margin:0;
+            font-family: 'Segoe UI', sans-serif;
+            background:#f3f4f6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar{
+            background:#fff;
+            padding:15px 30px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            box-shadow:0 2px 6px rgba(0,0,0,0.05);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+
+        /* LEFT LOGO */
+        .logo{
+            font-size:22px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        /* CENTER TITLE */
+        .nav-title{
+            font-size:18px;
+            font-weight:600;
+        }
+
+        /* ===== GRID ===== */
+        #product-container{
+            display:grid;
+            grid-template-columns:repeat(5, 1fr);
+            gap:20px;
+            padding:20px 30px;
+        }
+
+        /* ===== CARD ===== */
+        .product-card{
+            background:#fff;
+            border-radius:12px;
+            padding:12px;
+            transition:0.3s;
+            cursor:pointer;
+        }
+
+        .product-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        /* IMAGE */
+        .product-card img{
+            width:100%;
+            height:250px;
+            object-fit:cover;
+            border-radius:8px;
+            transition:0.3s;
+        }
+
+        .product-card:hover img{
+            transform:scale(1.05);
+        }
+
+        /* NAME */
+        .product-name{
+            font-size:14px;
+            margin:10px 0;
+            height:42px;
+            overflow:hidden;
+        }
+
+        /* PRICE */
+        .price{
+            font-size:15px;
+            font-weight:bold;
+            color:#1a7f37;
+        }
+
+        .old-price{
+            font-size:12px;
+            color:#888;
+            text-decoration:line-through;
+            margin-left:6px;
+        }
+
+        .discount{
+            font-size:11px;
+            color:red;
+            margin-left:6px;
+        }
+
+        /* BUTTON */
+        .btn{
+            margin-top:8px;
+            width:100%;
+            padding:8px;
+            background:black;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        .btn:hover{
+            background:#333;
+        }
+
+        /* NEW */
+        .new-label{
+            font-size:11px;
+            color:#ff3f6c;
+            font-weight:bold;
+            margin-bottom:5px;
+        }
+
+        /* PAGINATION */
+        .pagination{
+            display:flex;
+            justify-content:center;
+            gap:10px;
+            margin:20px 0;
+        }
+
+        .page-btn{
+            padding:6px 12px;
+            border:none;
+            background:#fff;
+            border-radius:5px;
+            cursor:pointer;
+            box-shadow:0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .page-btn.active{
+            background:black;
+            color:white;
+        }
+
+        .page-btn:hover{
+            background:#ddd;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:1200px){
+            #product-container{grid-template-columns:repeat(4,1fr);}
+        }
+        @media(max-width:900px){
+            #product-container{grid-template-columns:repeat(3,1fr);}
+        }
+        @media(max-width:600px){
+            #product-container{grid-template-columns:repeat(2,1fr);}
+        }
+
+        .loading{
+            text-align:center;
+            padding:20px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<div class="navbar">
+    <div class="logo" onclick="goHome()">MadHut</div>
+    <div class="nav-title">New Arrivals</div>
+    <div></div> <!-- empty for spacing -->
+</div>
+
+<div id="product-container">
+    <div class="loading">Loading products...</div>
+</div>
+
+<div class="pagination" id="pagination"></div>
+
+<script>
+    let currentPage = 1;
+    const limit = 10;
+
+    async function loadProducts(page=1){
+        try{
+            const response = await fetch(`http://127.0.0.1:5000/new/arrival/t-shirt?page=${page}&limit=${limit}`);
+            const data = await response.json();
+
+            const container = document.getElementById("product-container");
+            container.innerHTML = "";
+
+            data.products.forEach(product => {
+
+                let oldPrice = product.price + 300;
+                let discount = Math.floor(((oldPrice - product.price) / oldPrice) * 100);
+
+                const card = document.createElement("div");
+                card.classList.add("product-card");
+
+                card.addEventListener("click", () => {
+                    window.location.href = `product_detail.html?id=${product._id}`;
+                });
+
+                card.innerHTML = `
+                    <div class="new-label">NEW</div>
+
+                    <img src="${product.images[0]}" alt="product">
+
+                    <div class="product-name">${product.name}</div>
+
+                    <div>
+                        <span class="price">₹${product.price}</span>
+                        <span class="old-price">₹${oldPrice}</span>
+                        <span class="discount">(${discount}% off)</span>
+                    </div>
+
+                    <button class="btn" onclick="event.stopPropagation(); viewDetails('${product._id}')">
+                        View Details
+                    </button>
+                `;
+
+                container.appendChild(card);
+            });
+
+            setupPagination(page);
+
+        }catch(error){
+            console.error(error);
+            document.getElementById("product-container").innerHTML =
+                "<div class='loading'> Failed to load products</div>";
+        }
+    }
+
+    /* PAGINATION */
+    function setupPagination(page){
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        for(let i=1;i<=5;i++){
+            const btn = document.createElement("button");
+            btn.className = "page-btn";
+            if(i === page) btn.classList.add("active");
+
+            btn.innerText = i;
+
+            btn.onclick = () => {
+                currentPage = i;
+                loadProducts(i);
+            };
+
+            pagination.appendChild(btn);
+        }
+    }
+
+    /* NAVBAR */
+    function goHome(){
+        window.location.href = "index.html";
+    }
+
+    /* VIEW */
+    function viewDetails(id){
+        window.location.href = `product_detail.html?id=${id}`;
+    }
+
+    loadProducts();
+</script>
+
+</body>
+</html>

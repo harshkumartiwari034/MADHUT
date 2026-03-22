@@ -317,7 +317,7 @@
 
         <nav>
             <a href="customised_as_you_want.html">Customize your style</a>
-            <a href="#">New Arrivals</a>
+            <a href="recent_product.html">New Arrivals</a>
         </nav>
 
         <div>
@@ -366,7 +366,7 @@
 
     let currentPage = 1;
     let totalPages = 1;
-    const limit = 15;
+    const limit = 10;
     let isLoading = false;
 
     /* ================= NAVIGATION ================= */
@@ -435,7 +435,7 @@
 
     try{
 
-    const res = await fetch("https://madhut-4.onrender.com/fetch/total/item/in/cart",{
+    const res = await fetch("http://127.0.0.1:5000/fetch/total/item/in/cart",{
     headers:{ "Authorization":"Bearer "+token }
     });
 
@@ -497,7 +497,7 @@
     return;
     }
 
-    let url = `https://madhut-4.onrender.com/user/tshirts?page=${currentPage}&limit=${limit}`;
+    let url = ` http://127.0.0.1:5000/user/tshirts?page=${currentPage}&limit=${limit}`;
 
     try{
 
@@ -532,7 +532,7 @@
 
     if(sessionStorage.getItem(cacheKey)) return;
 
-    let url = `https://madhut-4.onrender.com/user/tshirts?page=${nextPage}&limit=${limit}`;
+    let url = ` http://127.0.0.1:5000/user/tshirts?page=${nextPage}&limit=${limit}`;
 
     try{
     const res = await fetch(url);

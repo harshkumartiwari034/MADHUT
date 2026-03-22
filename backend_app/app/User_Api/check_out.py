@@ -18,8 +18,8 @@ class CheckOutOrder(MethodView):
     def post(self):
         email = get_current_user()
         data = request.get_json()
-        quanity_ = data['quantity']
+        quantity_ = data['quantity']
         product_id = data['product_id']
         result = self.order_db.create_order(email, data)
-        self.tshirt_db.update_stock(ObjectId(product_id),quanity_)
+        self.tshirt_db.update_stock(ObjectId(product_id),quantity_)
         return result

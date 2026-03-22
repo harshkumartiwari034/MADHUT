@@ -29,7 +29,6 @@ class TshirtDatabase:
         skip = (page - 1) * limit
         query = {}
 
-
         projection = {
             "name": 1,
             "price": 1,
@@ -87,3 +86,5 @@ class TshirtDatabase:
             },
             {"$inc": {'stock': -quantity}}
         )
+
+
