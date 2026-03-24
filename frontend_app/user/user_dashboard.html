@@ -29,7 +29,7 @@
         background:white;
         display:flex;
         align-items:center;
-        justify-content:space-between;
+        justify-content:center; /* centered logo */
         padding:0 30px;
         box-shadow:0 4px 15px rgba(0,0,0,0.08);
         flex-wrap:wrap;
@@ -40,21 +40,11 @@
         font-weight:700;
         color:#3f72af;
         letter-spacing:1px;
+        cursor:pointer; /* clickable */
         }
 
-        .back-btn{
-        background:#3f72af;
-        border:none;
-        color:white;
-        padding:8px 16px;
-        border-radius:8px;
-        cursor:pointer;
-        font-size:14px;
-        transition:0.25s;
-        }
-
-        .back-btn:hover{
-        background:#2c5d96;
+        .logo:hover{
+        opacity:0.8;
         }
 
         /* CONTAINER */
@@ -144,10 +134,7 @@
 
         /* ================= RESPONSIVE ================= */
 
-        /* Tablet */
-
         @media (max-width:900px){
-
         .dashboard{
         padding:30px;
         }
@@ -159,18 +146,12 @@
         .card{
         padding:25px;
         }
-
         }
 
-        /* Mobile */
-
         @media (max-width:600px){
-
         .navbar{
-        padding:0 15px;
+        padding:12px 15px;
         height:auto;
-        padding-top:12px;
-        padding-bottom:12px;
         }
 
         .logo{
@@ -203,7 +184,6 @@
         .card-icon{
         font-size:30px;
         }
-
         }
 
     </style>
@@ -214,13 +194,8 @@
 <!-- NAVBAR -->
 
 <div class="navbar">
-
-    <button class="back-btn" onclick="goBack()">Back</button>
-
-    <div class="logo">MadHut</div>
-
+    <div class="logo" onclick="goBack()">MadHut</div>
 </div>
-
 
 <div class="container">
 
@@ -268,7 +243,6 @@
 
 </div>
 
-
 <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -289,53 +263,46 @@
     /* SECURITY CHECK */
 
     onAuthStateChanged(auth,(user)=>{
-
     if(!user || !token){
-    window.location.href="user_login.html";
+        window.location.href="user_login.html";
     }
-
     });
 
     /* NAVIGATION */
 
     window.goBack=function(){
-    window.history.back();
+        window.location.href = "index.html";
     }
 
     window.goProfile=function(){
-    window.location.href="user_profile.html";
+        window.location.href="user_profile.html";
     }
 
     window.goOrders=function(){
-    window.location.href="get_all_order.html";
+        window.location.href="get_all_order.html";
     }
 
     window.goCart=function(){
-    window.location.href="fetch_add_item_in_cart.html";
+        window.location.href="fetch_add_item_in_cart.html";
     }
 
     window.goWishlist=function(){
-    window.location.href="wishlist.html";
+        window.location.href="wishlist.html";
     }
 
     window.goSettings=function(){
-    window.location.href="settings.html";
+        window.location.href="settings.html";
     }
 
     /* LOGOUT */
 
     window.logout=function(){
-
-    signOut(auth)
-    .then(()=>{
-
-    localStorage.removeItem("userToken");
-    sessionStorage.removeItem("userToken");
-
-    window.location.href="user_login.html";
-
-    })
-
+        signOut(auth)
+        .then(()=>{
+            localStorage.removeItem("userToken");
+            sessionStorage.removeItem("userToken");
+            window.location.href="user_login.html";
+        })
     }
 
 </script>
