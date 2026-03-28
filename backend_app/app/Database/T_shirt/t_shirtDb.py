@@ -30,7 +30,6 @@ class TshirtDatabase:
 
         query = {}
 
-        # ✅ SAFE cursor pagination
         if last_id:
             try:
                 query["_id"] = {"$gt": ObjectId(last_id)}
@@ -58,6 +57,7 @@ class TshirtDatabase:
             products = products[:limit]
         for p in products:
             p["_id"] = str(p["_id"])
+        print(products)
         return {
             "products": products if products else [],
             "has_more": has_more,

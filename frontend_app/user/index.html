@@ -385,8 +385,6 @@
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // ===== CONFIG =====
     const BASE_URL = "https://madhut-7.onrender.com";
 
     const firebaseConfig = {
@@ -419,7 +417,7 @@
     socket.on("new_product", addNewProductToTop);
     socket.on("delete_product", (data) => removeProductFromUI(data._id));
 
-    async function fetchWithTimeout(url, options = {}, timeout = 8000) {
+    async function fetchWithTimeout(url, options = {}, timeout = 20000) {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
 
@@ -465,9 +463,6 @@
         }
     });
 
-    // =====================================
-    // CART COUNT
-    // =====================================
     async function fetchCartCount() {
         const user = auth.currentUser;
         if (!user) return;
@@ -487,9 +482,6 @@
         }
     }
 
-    // =====================================
-    // LOAD PRODUCTS
-    // =====================================
     async function loadTshirts() {
 
         if (isLoading || allLoaded) return;
@@ -501,7 +493,6 @@
 
             let data;
 
-            // 🔥 LOAD FROM CACHE FIRST (ONLY FIRST LOAD)
             if (!lastId) {
                 const cached = localStorage.getItem("products");
                 if (cached) {
@@ -532,7 +523,6 @@
 
             displayProducts(data.products);
 
-            // 🔥 CACHE FIRST LOAD
             if (!lastId) {
                 localStorage.setItem("products", JSON.stringify(data.products));
             }
@@ -543,21 +533,17 @@
                 allLoaded = true;
                 showNoMore();
             } else {
-                setTimeout(prefetchNext, 100); // 🔥 non-blocking
+                setTimeout(prefetchNext, 100);
             }
 
         } catch (err) {
             console.log(err);
-            showError("Failed to load products 😢");
+            showError("Failed to load products ");
         }
 
         isLoading = false;
         showLoader(false);
     }
-
-    // =====================================
-    // PREFETCH
-    // =====================================
     async function prefetchNext() {
 
         try {
@@ -611,10 +597,6 @@
         const card = document.querySelector(`[data-id="${productId}"]`);
         if (card) card.remove();
     }
-
-    // =====================================
-    // LOADER
-    // =====================================
     function showLoader(show) {
 
         let loader = document.getElementById("loader");
@@ -651,9 +633,6 @@
         container.after(msg);
     }
 
-    // =====================================
-    // SCROLL
-    // =====================================
     const trigger = document.createElement("div");
     container.after(trigger);
 
