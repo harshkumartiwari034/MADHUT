@@ -387,7 +387,7 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     // ===== CONFIG =====
-    const BASE_URL = "https://madhut-2.onrender.com";
+    const BASE_URL = "https://your-render-url.onrender.com"; // 🔥 CHANGE THIS
 
     const firebaseConfig = {
         apiKey: "AIzaSyAIqeoNVZaz6XXJRT71ODhreTR-WsmVyXY",
@@ -410,44 +410,61 @@
     let allLoaded = false;
     let nextBatch = null;
 
-    // ===== SOCKET (OPTIMIZED) =====
-    const socket = io(BASE_URL,{
-        transports:["websocket"],
-        reconnectionAttempts:2
+    // ===== SOCKET =====
+    const socket = io(BASE_URL, {
+        transports: ["websocket"],
+        reconnectionAttempts: 2
     });
 
     socket.on("new_product", addNewProductToTop);
-    socket.on("delete_product", (data)=>removeProductFromUI(data._id));
+    socket.on("delete_product", (data) => removeProductFromUI(data._id));
 
     // =====================================
-    // AUTH UI (RUN ONCE)
+    // 🔥 FETCH WITH TIMEOUT
+    // =====================================
+    async function fetchWithTimeout(url, options = {}, timeout = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            const res = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return res;
+        } catch (err) {
+            clearTimeout(id);
+            throw err;
+        }
+    }
+
+    // =====================================
+    // AUTH UI
     // =====================================
     onAuthStateChanged(auth, (user) => {
 
-        if(user){
+        if (user) {
             authSection.innerHTML = `
                 <span class="nav-btn" id="profileBtn">Account</span>
                 <span class="nav-btn" id="logoutBtn">Logout</span>
             `;
 
-            document.getElementById("profileBtn").onclick = ()=>{
-                window.location.href="user_dashboard.html";
+            document.getElementById("profileBtn").onclick = () => {
+                window.location.href = "user_dashboard.html";
             };
 
-            document.getElementById("logoutBtn").onclick = async ()=>{
+            document.getElementById("logoutBtn").onclick = async () => {
                 await signOut(auth);
                 location.reload();
             };
 
-            fetchCartCount(); // 🔥 only when user exists
+            fetchCartCount();
 
-        }else{
+        } else {
             authSection.innerHTML = `
                 <span class="nav-btn" id="loginBtn">Login</span>
             `;
 
-            document.getElementById("loginBtn").onclick = ()=>{
-                window.location.href="user_login.html";
+            document.getElementById("loginBtn").onclick = () => {
+                window.location.href = "user_login.html";
             };
 
             cartCount.textContent = 0;
@@ -455,58 +472,65 @@
     });
 
     // =====================================
-    // CART COUNT (NO INTERVAL SPAM)
+    // CART COUNT
     // =====================================
-    async function fetchCartCount(){
-
+    async function fetchCartCount() {
         const user = auth.currentUser;
-        if(!user) return;
+        if (!user) return;
 
-        try{
+        try {
             const token = await user.getIdToken();
 
-            const res = await fetch(`${BASE_URL}/fetch/total/item/in/cart`,{
-                headers:{ "Authorization":"Bearer "+token }
+            const res = await fetchWithTimeout(`${BASE_URL}/fetch/total/item/in/cart`, {
+                headers: { "Authorization": "Bearer " + token }
             });
 
             const data = await res.json();
             cartCount.textContent = data.count;
 
-        }catch{
+        } catch {
             cartCount.textContent = 0;
         }
     }
 
     // =====================================
-    // MAIN LOAD (FAST)
+    // LOAD PRODUCTS
     // =====================================
-    async function loadTshirts(){
+    async function loadTshirts() {
 
-        if(isLoading || allLoaded) return;
+        if (isLoading || allLoaded) return;
 
         isLoading = true;
         showLoader(true);
 
-        try{
+        try {
 
             let data;
 
-            // 🔥 use prefetched data
-            if(nextBatch){
+            // 🔥 LOAD FROM CACHE FIRST (ONLY FIRST LOAD)
+            if (!lastId) {
+                const cached = localStorage.getItem("products");
+                if (cached) {
+                    displayProducts(JSON.parse(cached));
+                }
+            }
+
+            if (nextBatch) {
                 data = nextBatch;
                 nextBatch = null;
-            }else{
-                let url = `${BASE_URL}/user/tshirts?limit=20`;
+            } else {
 
-                if(lastId){
+                let url = `${BASE_URL}/user/tshirts?limit=30`;
+
+                if (lastId) {
                     url += `&last_id=${lastId}`;
                 }
 
-                const res = await fetch(url);
+                const res = await fetchWithTimeout(url);
                 data = await res.json();
             }
 
-            if(!data.products || data.products.length === 0){
+            if (!data.products || data.products.length === 0) {
                 allLoaded = true;
                 showNoMore();
                 return;
@@ -514,17 +538,23 @@
 
             displayProducts(data.products);
 
-            lastId = data.products[data.products.length - 1]._id;
-
-            if(data.products.length < 20){
-                allLoaded = true;
-                showNoMore();
-            }else{
-                prefetchNext();
+            // 🔥 CACHE FIRST LOAD
+            if (!lastId) {
+                localStorage.setItem("products", JSON.stringify(data.products));
             }
 
-        }catch(err){
+            lastId = data.products[data.products.length - 1]._id;
+
+            if (data.products.length < 30) {
+                allLoaded = true;
+                showNoMore();
+            } else {
+                setTimeout(prefetchNext, 100); // 🔥 non-blocking
+            }
+
+        } catch (err) {
             console.log(err);
+            showError("Failed to load products 😢");
         }
 
         isLoading = false;
@@ -532,45 +562,41 @@
     }
 
     // =====================================
-    // PREFETCH (BACKGROUND)
+    // PREFETCH
     // =====================================
-    async function prefetchNext(){
+    async function prefetchNext() {
 
-        try{
-            let url = `${BASE_URL}/user/tshirts?limit=20&last_id=${lastId}`;
-
-            const res = await fetch(url);
+        try {
+            let url = `${BASE_URL}/user/tshirts?limit=30&last_id=${lastId}`;
+            const res = await fetchWithTimeout(url);
             nextBatch = await res.json();
-
-        }catch(err){
+        } catch (err) {
             console.log("Prefetch error", err);
         }
     }
+    function displayProducts(products) {
+        products.forEach(product => {
+            if (document.querySelector(`[data-id="${product._id}"]`)) return;
 
-    // =====================================
-    // UI FUNCTIONS
-    // =====================================
-    function displayProducts(products){
-        products.forEach(product=>{
             const card = createCard(product);
             container.appendChild(card);
         });
     }
 
-    function createCard(product){
+    function createCard(product) {
 
         const card = document.createElement("div");
-        card.className="card";
+        card.className = "card";
         card.dataset.id = product._id;
 
-        card.onclick = ()=>{
+        card.onclick = () => {
             window.location.href = `product_detail.html?id=${product._id}`;
         };
 
         const imageUrl = product.image || product.images?.[0] || "";
 
-        card.innerHTML=`
-            <img src="${imageUrl}" loading="lazy" decoding="async">
+        card.innerHTML = `
+            <img src="${imageUrl}?f_auto,q_auto,w=400" loading="lazy" decoding="async">
             <div class="overlay"></div>
             <div class="content">
                 <div>${product.name}</div>
@@ -580,36 +606,38 @@
         return card;
     }
 
-    function addNewProductToTop(product){
+    function addNewProductToTop(product) {
+        if (document.querySelector(`[data-id="${product._id}"]`)) return;
+
         const card = createCard(product);
         container.prepend(card);
     }
 
-    function removeProductFromUI(productId){
+    function removeProductFromUI(productId) {
         const card = document.querySelector(`[data-id="${productId}"]`);
-        if(card) card.remove();
+        if (card) card.remove();
     }
 
     // =====================================
     // LOADER
     // =====================================
-    function showLoader(show){
+    function showLoader(show) {
 
         let loader = document.getElementById("loader");
 
-        if(!loader){
+        if (!loader) {
             loader = document.createElement("div");
-            loader.id="loader";
-            loader.innerHTML=`<div class="loader-spinner"></div>`;
+            loader.id = "loader";
+            loader.innerHTML = `<div class="loader-spinner"></div>`;
             container.after(loader);
         }
 
         loader.style.display = show ? "flex" : "none";
     }
 
-    function showNoMore(){
+    function showNoMore() {
 
-        if(document.getElementById("endMsg")) return;
+        if (document.getElementById("endMsg")) return;
 
         const msg = document.createElement("div");
         msg.id = "endMsg";
@@ -621,25 +649,32 @@
         container.after(msg);
     }
 
+    function showError(message) {
+        const msg = document.createElement("div");
+        msg.style.textAlign = "center";
+        msg.style.color = "red";
+        msg.style.padding = "20px";
+        msg.innerText = message;
+
+        container.after(msg);
+    }
+
     // =====================================
-    // 🔥 BEST SCROLL (ONLY ONE METHOD)
+    // SCROLL
     // =====================================
     const trigger = document.createElement("div");
     container.after(trigger);
 
-    const observer = new IntersectionObserver((entries)=>{
-        if(entries[0].isIntersecting){
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
             loadTshirts();
         }
     });
 
     observer.observe(trigger);
 
-    // =====================================
-    // INIT (MINIMAL)
-    // =====================================
-    window.onload = ()=>{
-        loadTshirts();   // 🔥 only main call
+    window.onload = () => {
+        loadTshirts();
     };
 
 </script>

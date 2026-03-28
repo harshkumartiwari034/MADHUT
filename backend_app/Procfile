@@ -1,1 +1,1 @@
-gunicorn run:app
+gunicorn run:app -k gevent --workers 1 --timeout 120

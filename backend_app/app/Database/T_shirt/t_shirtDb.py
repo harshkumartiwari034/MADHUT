@@ -10,6 +10,7 @@ class TshirtDatabase:
             'mongodb+srv://harshkumartiwari034_db_user:AEXLTbDqQwSQ9CQ0@madhut.ej8ujxj.mongodb.net/?appName=MadHut')
         self.db = self.client['MadHut']
         self.collection = self.db['T_shirt']
+        self.collection.create_index([("_id", -1)])
 
     def insert_data(self, name, description, price, old_price, images, sizes, colors, stock, category, tags, slug,
                     discount_percent):
@@ -26,13 +27,16 @@ class TshirtDatabase:
         return {"_id": str(result.inserted_id), "name": name, 'price': price, "old_price": old_price,
                 "image": image}
 
-    def fetch_products(self, last_id=None, limit=10):
+    def fetch_products(self, last_id=None, limit=20):
 
         query = {}
 
-        # 👉 Cursor based pagination (VERY FAST)
+        # ✅ SAFE cursor pagination
         if last_id:
-            query["_id"] = {"$gt": ObjectId(last_id)}
+            try:
+                query["_id"] = {"$gt": ObjectId(last_id)}
+            except:
+                query = {}
 
         projection = {
             "name": 1,
@@ -42,26 +46,23 @@ class TshirtDatabase:
             "images": {"$slice": 1}
         }
 
-        datas = (
+        cursor = (
             self.collection
             .find(query, projection)
-            .sort("_id", 1)  # IMPORTANT
-            .limit(limit + 1)  # 👈 get extra to check has_more
+            .sort("_id", 1)
+            .limit(limit + 1)
         )
-
-        product_list = list(datas)
-
-        has_more = len(product_list) > limit
+        products = list(cursor)
+        has_more = len(products) > limit
 
         if has_more:
-            product_list.pop()  # remove extra item
-
-        for data in product_list:
-            data["_id"] = str(data["_id"])
-
+            products = products[:limit]
+        for p in products:
+            p["_id"] = str(p["_id"])
         return {
-            "products": product_list,
-            "has_more": has_more
+            "products": products if products else [],
+            "has_more": has_more,
+            "count": len(products)
         }
 
     def fetch_single_product_detail(self, product_id):

@@ -12,10 +12,11 @@ class FetchTshirt(MethodView):
     def __init__(self):
         self.tshirt_db = TshirtDatabase()
 
-    @cache.cached(timeout=120, query_string=True)
+    @cache.cached(timeout=60)
     def get(self):
         last_id = request.args.get('last_id')
-        limit = int(request.args.get('limit', 10))
+        limit = int(request.args.get('limit', 20))
+        if last_id:
+            return jsonify(self.tshirt_db.fetch_products(last_id, limit))
 
-        result = self.tshirt_db.fetch_products(last_id, limit)
-        return jsonify(result)
+        return jsonify(self.tshirt_db.fetch_products(None, limit))
