@@ -10,7 +10,6 @@ class TshirtDatabase:
             'mongodb+srv://harshkumartiwari034_db_user:AEXLTbDqQwSQ9CQ0@madhut.ej8ujxj.mongodb.net/?appName=MadHut')
         self.db = self.client['MadHut']
         self.collection = self.db['T_shirt']
-        self.collection.create_index([("_id", -1)])
 
     def insert_data(self, name, description, price, old_price, images, sizes, colors, stock, category, tags, slug,
                     discount_percent):
