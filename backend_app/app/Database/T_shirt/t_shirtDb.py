@@ -28,21 +28,18 @@ class TshirtDatabase:
 
     def fetch_products(self, page, limit):
         skip = (page - 1) * limit
-        query = {}
 
         projection = {
             "name": 1,
             "price": 1,
             "old_price": 1,
-            "discount_percent":1,
+            "discount_percent": 1,
             "images": {"$slice": 1}
-            
         }
 
         datas = (
             self.collection
-            .find(query, projection)
-            .sort("random", 1)
+            .find({}, projection)
             .skip(skip)
             .limit(limit)
         )
@@ -52,12 +49,8 @@ class TshirtDatabase:
             data['_id'] = str(data.get("_id"))
             product_list.append(data)
 
-        total_products = self.collection.count_documents(query)
-        total_pages = (total_products + limit - 1) // limit
-
         return {
-            'products': product_list,
-            'total_pages': total_pages
+            'products': product_list
         }
 
     def fetch_single_product_detail(self, product_id):
