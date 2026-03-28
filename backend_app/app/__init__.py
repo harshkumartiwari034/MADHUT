@@ -30,6 +30,10 @@ def create_app():
     order_db.create_order_index()
     firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
 
+    @app.route("/ping")
+    def ping():
+        return {"status": "ok"}, 200
+
     if not firebase_credentials:
         raise ValueError("FIREBASE_CREDENTIALS not set in environment")
 

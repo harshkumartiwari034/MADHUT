@@ -6,5 +6,9 @@ load_dotenv()
 app = create_app()
 socketio.init_app(app)
 
+
+
 if __name__ == "__main__":
     socketio.run(app, debug=True)
+
+
