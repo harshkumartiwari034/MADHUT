@@ -26,8 +26,13 @@ class TshirtDatabase:
         return {"_id": str(result.inserted_id), "name": name, 'price': price, "old_price": old_price,
                 "image": image}
 
-    def fetch_products(self, page, limit):
-        skip = (page - 1) * limit
+    def fetch_products(self, last_id=None, limit=10):
+
+        query = {}
+
+        # 👉 Cursor based pagination (VERY FAST)
+        if last_id:
+            query["_id"] = {"$gt": ObjectId(last_id)}
 
         projection = {
             "name": 1,
@@ -39,18 +44,24 @@ class TshirtDatabase:
 
         datas = (
             self.collection
-            .find({}, projection)
-            .skip(skip)
-            .limit(limit)
+            .find(query, projection)
+            .sort("_id", 1)  # IMPORTANT
+            .limit(limit + 1)  # 👈 get extra to check has_more
         )
 
-        product_list = []
-        for data in datas:
-            data['_id'] = str(data.get("_id"))
-            product_list.append(data)
+        product_list = list(datas)
+
+        has_more = len(product_list) > limit
+
+        if has_more:
+            product_list.pop()  # remove extra item
+
+        for data in product_list:
+            data["_id"] = str(data["_id"])
 
         return {
-            'products': product_list
+            "products": product_list,
+            "has_more": has_more
         }
 
     def fetch_single_product_detail(self, product_id):

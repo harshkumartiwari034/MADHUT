@@ -403,7 +403,7 @@
     const cartCount = document.getElementById("cartCount");
     const authSection = document.getElementById("authSection");
 
-    let page = 1;
+    let lastId = null;
     let isLoading = false;
     let allLoaded = false;
 
@@ -478,30 +478,44 @@
 
     async function loadTshirts(){
 
-        if(isLoading || allLoaded) return;
-        isLoading = true;
+            if(isLoading || allLoaded) return;
+            isLoading = true;
 
-        showLoader(true);
+            showLoader(true);
 
-        try{
-            const res = await fetch(`https://madhut-2.onrender.com/user/tshirts?page=${page}&limit=10`);
-            const data = await res.json();
+            try{
+                let url = `https://madhut-2.onrender.com/user/tshirts?limit=10`;
 
-            if(!data.products || data.products.length === 0){
-                allLoaded = true;
-                showLoader(false);
-                return;
+                if(lastId){
+                    url += `&last_id=${lastId}`;
+                }
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if(!data.products || data.products.length === 0){
+                    allLoaded = true;
+                    showNoMore();
+                    return;
+                }
+
+                displayProducts(data.products);
+
+                // 👉 update last_id
+                lastId = data.products[data.products.length - 1]._id;
+
+                if(!data.has_more){
+                    allLoaded = true;
+                    showNoMore();
+                }
+
+            }catch(err){
+                console.log(err);
             }
 
-            displayProducts(data.products);
-            page++;
+            isLoading = false;
+            showLoader(false);
 
-        }catch(err){
-            console.log(err);
-        }
-
-        isLoading = false;
-        showLoader(false);
     }
 
     // =====================================
@@ -593,6 +607,21 @@
 
         },200);
     });
+    function showNoMore(){
+
+    let msg = document.getElementById("endMsg");
+
+    if(!msg){
+        msg = document.createElement("div");
+        msg.id = "endMsg";
+        msg.style.textAlign = "center";
+        msg.style.padding = "20px";
+        msg.style.fontWeight = "600";
+        msg.innerText = "No more products 🚫";
+
+        container.after(msg);
+    }
+}
 
     window.onload=()=>{
         updateAuthUI();
