@@ -109,8 +109,6 @@
             display:grid;
             grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
             gap:20px;
-             transition: all 0.3s ease;
-             min-height: 800px;
         }
 
         .card{
@@ -178,7 +176,6 @@
             color:#f1c40f;
             margin-bottom:18px;
             font-size:22px;
-            font-weight:700;
         }
 
         /* LINKS */
@@ -293,11 +290,6 @@
                 grid-template-columns:1fr;
             }
         }
-        @keyframes pulse{
-            0%{opacity:0.6;}
-            50%{opacity:1;}
-            100%{opacity:0.6;}
-        }
     </style>
 </head>
 
@@ -340,24 +332,24 @@
         <div class="footer-col">
             <h2 class="logo">MADHUT</h2>
 
-            <!--            <p class="footer-link">Contact Us</p>-->
-            <!--            <p class="footer-link">Track Order</p>-->
-            <!--            <p class="footer-link">Return Order</p>-->
-            <!--            <p class="footer-link">Cancel Order</p>-->
+<!--            <p class="footer-link">Contact Us</p>-->
+<!--            <p class="footer-link">Track Order</p>-->
+<!--            <p class="footer-link">Return Order</p>-->
+<!--            <p class="footer-link">Cancel Order</p>-->
 
-            <!--            <p class="footer-small">🚚 15 Days Return Policy</p>-->
-            <!--            <p class="footer-small">💵 Cash On Delivery</p>-->
+<!--            <p class="footer-small">🚚 15 Days Return Policy</p>-->
+<!--            <p class="footer-small">💵 Cash On Delivery</p>-->
         </div>
 
         <!-- COMPANY -->
-        <!--        <div class="footer-col">-->
-        <!--            <h3>COMPANY</h3>-->
+<!--        <div class="footer-col">-->
+<!--            <h3>COMPANY</h3>-->
 
-        <!--            <p class="footer-link">About Us</p>-->
-        <!--            <p class="footer-link">Terms & Conditions</p>-->
-        <!--            <p class="footer-link">Privacy Policy</p>-->
-        <!--            <p class="footer-link">We are Hiring</p>-->
-        <!--        </div>-->
+<!--            <p class="footer-link">About Us</p>-->
+<!--            <p class="footer-link">Terms & Conditions</p>-->
+<!--            <p class="footer-link">Privacy Policy</p>-->
+<!--            <p class="footer-link">We are Hiring</p>-->
+<!--        </div>-->
 
         <!-- CONNECT -->
         <div class="footer-col">
@@ -391,7 +383,12 @@
 
 <script type="module">
 
-    // ===== YOUR EXISTING IMPORTS SAME =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = { apiKey:"AIza...", authDomain:"madhut-97c1e.firebaseapp.com", projectId:"madhut-97c1e", appId:"1:443..." };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
     const container = document.getElementById("tshirtContainer");
     const cartCount = document.getElementById("cartCount");
@@ -401,39 +398,64 @@
     let isLoading = false;
     let allLoaded = false;
 
-    // ✅ SOCKET (same)
     const socket = io("https://madhut-2.onrender.com");
 
+    socket.on("connect", () => console.log("Connected"));
     socket.on("new_product", (product) => addNewProductToTop(product));
     socket.on("delete_product", (data) => removeProductFromUI(data._id));
 
-    // ✅ SKELETON
-    function showSkeleton(){
-        container.innerHTML = "";
+    function goToLogin(){ window.location.href="user_login.html"; }
+    function goToProfile(){ window.location.href="user_dashboard.html"; }
 
-        for(let i=0;i<8;i++){
-            const skeleton = document.createElement("div");
-            skeleton.style.height = "320px";
-            skeleton.style.borderRadius = "16px";
-            skeleton.style.background = "#eee";
-            skeleton.style.animation = "pulse 1.2s infinite";
+    function updateAuthUI(){
+        const token = localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
 
-            container.appendChild(skeleton);
+        if(token){
+            authSection.innerHTML = `
+                <span class="nav-btn" id="profileBtn">Account</span>
+                <span class="nav-btn" id="logoutBtn">Logout</span>
+            `;
+            document.getElementById("logoutBtn").onclick = logout;
+            document.getElementById("profileBtn").onclick = goToProfile;
+        }else{
+            authSection.innerHTML = `<span class="nav-btn" id="loginBtn">Login</span>`;
+            document.getElementById("loginBtn").onclick = goToLogin;
         }
     }
 
-    // ✅ LOAD PRODUCTS
+    async function logout(){
+        try{ await signOut(auth); }catch(e){}
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href="user_login.html";
+    }
+
+    async function fetchCartCount(){
+        const token = localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
+
+        if(!token){ cartCount.textContent=0; return; }
+
+        try{
+            const res = await fetch("https://madhut-2.onrender.com/fetch/total/item/in/cart",{
+                headers:{ "Authorization":"Bearer "+token },
+                cache:"no-store"
+            });
+
+            const data = await res.json();
+            cartCount.textContent = data.count;
+
+        }catch{
+            cartCount.textContent = 0;
+        }
+    }
+
     async function loadTshirts(){
 
         if(isLoading || allLoaded) return;
         isLoading = true;
 
-        if(page > 1){
-            showLoader(true);
-        }
-
         try{
-            const res = await fetch(`https://madhut-2.onrender.com/user/tshirts?page=${page}&limit=12`);
+            const res = await fetch(`https://madhut-2.onrender.com/user/tshirts?page=${page}&limit=10`);
             const data = await res.json();
 
             if(!data.products || data.products.length === 0){
@@ -442,6 +464,7 @@
                 return;
             }
 
+            showLoader(true);
             displayProducts(data.products);
             page++;
 
@@ -453,53 +476,99 @@
         showLoader(false);
     }
 
-    // ✅ DISPLAY
     function displayProducts(products){
-
-        if(page === 1){
-            container.innerHTML = ""; // remove skeleton
-        }
-
         products.forEach(product=>{
             const card = createCard(product);
             container.appendChild(card);
         });
     }
 
-    // ✅ OBSERVER (BEST SCROLL FIX)
-    const observer = new IntersectionObserver((entries)=>{
-        if(entries[0].isIntersecting){
+    function createCard(product){
+
+        const card = document.createElement("div");
+        card.className="card";
+        card.dataset.id = product._id;
+
+        card.addEventListener("click", ()=>{
+            window.location.href = `product_detail.html?id=${product._id}`;
+        });
+
+        const imageUrl = product.image || product.images?.[0] || "";
+
+        card.innerHTML=`
+            <img src="${imageUrl}">
+            <div class="overlay"></div>
+            <div class="content">
+                <div>${product.name}</div>
+
+                <div style="font-size:14px;">
+                    ₹${product.price}
+
+                    ${
+                        product.old_price
+                        ? `<span style="text-decoration:line-through;opacity:0.7;margin-left:6px;">
+                            ₹${product.old_price}
+                           </span>`
+                        : ""
+                    }
+
+                    ${
+                        product.discount_percent
+                        ? `<span style="color:#d4af37;font-weight:600;margin-left:6px;">
+                            ${product.discount_percent}% OFF
+                           </span>`
+                        : ""
+                    }
+                </div>
+            </div>
+        `;
+        return card;
+    }
+
+    function addNewProductToTop(product){
+        const card = createCard(product);
+        container.prepend(card);
+    }
+
+    function removeProductFromUI(productId){
+        const card = document.querySelector(`[data-id="${productId}"]`);
+        if(card){
+            card.style.opacity = "0";
+            setTimeout(()=>{ card.remove(); },300);
+        }
+    }
+
+    function showLoader(show){
+        if(allLoaded) return;
+
+        let loader = document.getElementById("loader");
+
+        if(!loader){
+            loader = document.createElement("div");
+            loader.id="loader";
+            loader.innerHTML=`<div class="loader-spinner"></div>`;
+            container.after(loader);
+        }
+
+        loader.style.display = show ? "block" : "none";
+    }
+
+    window.addEventListener("scroll",()=>{
+        if(allLoaded) return;
+
+        if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 200){
             loadTshirts();
         }
-    },{
-        root:null,
-        rootMargin:"100px",
-        threshold:0
     });
 
-    // ✅ ADD TRIGGER ELEMENT
-    const loadTrigger = document.createElement("div");
-    loadTrigger.style.height = "10px";
-    container.after(loadTrigger);
-
-    observer.observe(loadTrigger);
-
-
-    // ===== KEEP ALL YOUR EXISTING FUNCTIONS SAME =====
-    // createCard, addNewProductToTop, removeProductFromUI, showLoader etc.
-
-
-    // ✅ INIT
     window.onload=()=>{
         updateAuthUI();
         fetchCartCount();
-
-        showSkeleton();
         loadTshirts();
-
         setInterval(fetchCartCount,15000);
     };
 
 </script>
+
 </body>
 </html>
