@@ -99,7 +99,7 @@
 
         .product-grid{
             display:grid;
-            grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+            grid-template-columns:repeat(4,1fr);
             gap:20px;
         }
 
@@ -107,7 +107,7 @@
             position:relative;
             border-radius:18px;
             overflow:hidden;
-            height:420px;
+            height:260px;
             cursor:pointer;
             background:#fff;
             box-shadow:0 10px 25px rgba(0,0,0,0.1);
@@ -270,6 +270,11 @@
             font-size:13px;
             opacity:0.7;
         }
+        @media(max-width:1024px){
+            .product-grid{
+                grid-template-columns:repeat(3,1fr);
+            }
+        }
 
         /* RESPONSIVE */
        @media(max-width:768px){
@@ -279,19 +284,28 @@
             }
 
             .container{
-                padding:110px 15px 30px 15px;
+                padding:110px 12px 30px 15px;
             }
 
             .horizontal-ad{
                 width:100%;
-                font-size:16px;
+                font-size:15px;
+            }
+            .product-grid{
+                grid-template-columns:repeat(2,1fr); /* tablet */
+                gap:12px;
+            }
+               .card{
+                height:260px; /* compact */
             }
        }
+
+
 
         @media(max-width:500px){
             .product-grid{
                 grid-template-columns:repeat(2,1fr);
-                gap:12px;
+                gap:10px;
             }
 
             .card{
@@ -499,6 +513,8 @@
             if (!data.next_cursor) {
                 allLoaded = true;
                 observer.disconnect();
+                showLoader(false);
+                return;
             } else {
                 lastId = data.next_cursor;
             }
@@ -589,28 +605,30 @@
     // ===== LOADER =====
     function showLoader(show) {
 
-        let loader = document.getElementById("loader");
+            if (allLoaded) return;
 
-        if (!loader) {
-            loader = document.createElement("div");
-            loader.id = "loader";
+            let loader = document.getElementById("loader");
 
-            loader.innerHTML = `
-                <div style="
-                    display:grid;
-                    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-                    gap:20px;
-                ">
-                    ${Array(6).fill().map(() => `
-                        <div class="skeleton" style="height:260px;"></div>
-                    `).join("")}
-                </div>
-            `;
+            if (!loader) {
+                loader = document.createElement("div");
+                loader.id = "loader";
 
-            container.after(loader);
-        }
+                loader.innerHTML = `
+                    <div style="
+                        display:grid;
+                        grid-template-columns:repeat(4,1fr);
+                        gap:18px;
+                    ">
+                        ${Array(4).fill().map(() => `
+                            <div class="skeleton" style="height:250px;"></div>
+                        `).join("")}
+                    </div>
+                `;
 
-        loader.style.display = show ? "block" : "none";
+                container.after(loader);
+            }
+
+            loader.style.display = show ? "block" : "none";
     }
 
     // ===== ERROR =====
