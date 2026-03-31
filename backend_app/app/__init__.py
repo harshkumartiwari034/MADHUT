@@ -49,11 +49,12 @@ def create_app():
         resources={
             r"/*": {
                 "origins": [
-                    "https://www.shopmadhut.com",
-                    "https://shopmadhut.com",
-                    "https://mad-hut.vercel.app",
+                    "https://madhut-kp2y.vercel.app",
+                    # "https://www.shopmadhut.com",
+                    # "https://shopmadhut.com",
+                    # "https://mad-hut.vercel.app",
                     "http://localhost:63342",
-                    "https://mad-hut-5pse.vercel.app"
+                    # "https://mad-hut-5pse.vercel.app"
                 ]
             }
         },
