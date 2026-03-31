@@ -8,14 +8,12 @@
     <link rel="icon" type="image/x-icon" href="static/images/mad_hut.jpeg">
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
         html{scroll-behavior:smooth;}
         body{background:#f4f6f9;display:flex;flex-direction:column;min-height:100vh;}
         .main-content{flex:1;}
 
-        /* ✅ FIXED HEADER */
         .header{
             display:flex;justify-content:space-between;align-items:center;
             padding:18px 60px;background:#111;color:white;
@@ -35,9 +33,6 @@
 
         .header-right{display:flex;align-items:center;gap:12px;}
 
-        .cart-box{
-            background:#222;padding:6px 12px;border-radius:20px;font-size:13px;
-        }
 
         .nav-btn{
             padding:6px 14px;border-radius:20px;font-size:13px;
@@ -45,12 +40,10 @@
         }
         .nav-btn:hover{background:#0fa36b;border-color:#0fa36b;}
 
-        /* ✅ PUSH CONTENT DOWN */
         .container{
             padding:120px 60px 40px 60px;
         }
 
-        /* ✅ PREMIUM AD (SCROLLS AWAY) */
         .horizontal-ad{
             width:85%;
             margin:0 auto 30px auto;
@@ -104,17 +97,20 @@
             color:#d4af37;
         }
 
-        /* PRODUCTS */
         .product-grid{
             display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            grid-template-columns:repeat(5, 1fr);  /* 🔥 fixed 5 per row */
             gap:20px;
         }
 
         .card{
-            position:relative;border-radius:16px;overflow:hidden;height:320px;
-            cursor:pointer;background:#fff;
-            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+            position:relative;
+            border-radius:18px;
+            overflow:hidden;
+            height:420px;
+            cursor:pointer;
+            background:#fff;
+            box-shadow:0 10px 25px rgba(0,0,0,0.1);
             transition:0.3s;
 
             opacity:0;
@@ -306,9 +302,6 @@
         </nav>
 
         <div class="header-right">
-            <div class="cart-box">
-                Cart (<span id="cartCount">0</span>)
-            </div>
             <div id="authSection"></div>
         </div>
     </header>
@@ -331,25 +324,8 @@
         <!-- LEFT -->
         <div class="footer-col">
             <h2 class="logo">MADHUT</h2>
-
-            <!--            <p class="footer-link">Contact Us</p>-->
-            <!--            <p class="footer-link">Track Order</p>-->
-            <!--            <p class="footer-link">Return Order</p>-->
-            <!--            <p class="footer-link">Cancel Order</p>-->
-
-            <!--            <p class="footer-small">🚚 15 Days Return Policy</p>-->
-            <!--            <p class="footer-small">💵 Cash On Delivery</p>-->
         </div>
 
-        <!-- COMPANY -->
-        <!--        <div class="footer-col">-->
-        <!--            <h3>COMPANY</h3>-->
-
-        <!--            <p class="footer-link">About Us</p>-->
-        <!--            <p class="footer-link">Terms & Conditions</p>-->
-        <!--            <p class="footer-link">Privacy Policy</p>-->
-        <!--            <p class="footer-link">We are Hiring</p>-->
-        <!--        </div>-->
 
         <!-- CONNECT -->
         <div class="footer-col">
@@ -367,11 +343,13 @@
         <!-- SUBSCRIBE -->
         <div class="footer-col">
             <h3>KEEP UP TO DATE</h3>
-
-            <div class="subscribe-box">
-                <input type="text" placeholder="Enter Email Id">
-                <button>SUBSCRIBE</button>
-            </div>
+            <input
+                    type="email"
+                    id="subscribeEmail"
+                    name="email"
+                    placeholder="Enter Email Id"
+                    autocomplete="email"
+            >
         </div>
 
     </div>
@@ -385,7 +363,8 @@
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    const BASE_URL = "https://madhut-7.onrender.com";
+
+    const BASE_URL = "http://127.0.0.1:5000";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAIqeoNVZaz6XXJRT71ODhreTR-WsmVyXY",
@@ -399,14 +378,16 @@
 
     // ===== ELEMENTS =====
     const container = document.getElementById("tshirtContainer");
-    const cartCount = document.getElementById("cartCount");
     const authSection = document.getElementById("authSection");
 
     // ===== STATE =====
     let lastId = null;
     let isLoading = false;
     let allLoaded = false;
-    let nextBatch = null;
+
+    // ===== CACHE KEYS =====
+    const CACHE_KEY = "tshirts_cache";
+    const CURSOR_KEY = "tshirts_cursor";
 
     // ===== SOCKET =====
     const socket = io(BASE_URL, {
@@ -417,20 +398,7 @@
     socket.on("new_product", addNewProductToTop);
     socket.on("delete_product", (data) => removeProductFromUI(data._id));
 
-    async function fetchWithTimeout(url, options = {}, timeout = 20000) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
-
-        try {
-            const res = await fetch(url, { ...options, signal: controller.signal });
-            clearTimeout(id);
-            return res;
-        } catch (err) {
-            clearTimeout(id);
-            throw err;
-        }
-    }
-
+    // ===== AUTH =====
     onAuthStateChanged(auth, (user) => {
 
         if (user) {
@@ -448,7 +416,6 @@
                 location.reload();
             };
 
-            fetchCartCount();
 
         } else {
             authSection.innerHTML = `
@@ -458,29 +425,9 @@
             document.getElementById("loginBtn").onclick = () => {
                 window.location.href = "user_login.html";
             };
-
-            cartCount.textContent = 0;
         }
     });
 
-    async function fetchCartCount() {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        try {
-            const token = await user.getIdToken();
-
-            const res = await fetchWithTimeout(`${BASE_URL}/fetch/total/item/in/cart`, {
-                headers: { "Authorization": "Bearer " + token }
-            });
-
-            const data = await res.json();
-            cartCount.textContent = data.count;
-
-        } catch {
-            cartCount.textContent = 0;
-        }
-    }
 
     async function loadTshirts() {
 
@@ -491,69 +438,49 @@
 
         try {
 
-            let data;
-
+            // 🔥 LOAD FROM CACHE
             if (!lastId) {
-                const cached = localStorage.getItem("products");
+                const cached = localStorage.getItem(CACHE_KEY);
+                const cachedCursor = localStorage.getItem(CURSOR_KEY);
+
                 if (cached) {
                     displayProducts(JSON.parse(cached));
+                    lastId = cachedCursor;
+                    isLoading = false;
+                    showLoader(false);
+                    return;
                 }
             }
 
-            if (nextBatch) {
-                data = nextBatch;
-                nextBatch = null;
-            } else {
+            // 🔥 API CALL
+            let url = `${BASE_URL}/user/tshirts?limit=10`;
 
-                let url = `${BASE_URL}/user/tshirts?limit=20`;
-
-                if (lastId) {
-                    url += `&last_id=${lastId}`;
-                }
-
-                const res = await fetchWithTimeout(url);
-                data = await res.json();
+            if (lastId) {
+                url += `&last_id=${lastId}`;
             }
 
-            if (!data.products || data.products.length === 0) {
-                allLoaded = true;
-                showNoMore();
-                return;
-            }
+            const res = await fetch(url);
+            const data = await res.json();
 
             displayProducts(data.products);
 
+            // 🔥 SAVE CACHE (ONLY FIRST LOAD)
             if (!lastId) {
-                localStorage.setItem("products", JSON.stringify(data.products));
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data.products));
+                localStorage.setItem(CURSOR_KEY, data.next_cursor);
             }
 
-            lastId = data.products[data.products.length - 1]._id;
-
-            if (data.products.length < 30) {
-                allLoaded = true;
-                showNoMore();
-            } else {
-                setTimeout(prefetchNext, 100);
-            }
+            lastId = data.next_cursor;
 
         } catch (err) {
             console.log(err);
-            showError("Failed to load products ");
         }
 
         isLoading = false;
         showLoader(false);
     }
-    async function prefetchNext() {
 
-        try {
-            let url = `${BASE_URL}/user/tshirts?limit=30&last_id=${lastId}`;
-            const res = await fetchWithTimeout(url);
-            nextBatch = await res.json();
-        } catch (err) {
-            console.log("Prefetch error", err);
-        }
-    }
+    // ===== DISPLAY =====
     function displayProducts(products) {
         products.forEach(product => {
             if (document.querySelector(`[data-id="${product._id}"]`)) return;
@@ -563,6 +490,7 @@
         });
     }
 
+    // ===== CARD =====
     function createCard(product) {
 
         const card = document.createElement("div");
@@ -573,20 +501,49 @@
             window.location.href = `product_detail.html?id=${product._id}`;
         };
 
-        const imageUrl = product.image || product.images?.[0] || "";
+        // 🔥 smaller image (faster)
+        const imageUrl = (product.images?.[0] || "") + "?f_auto,q_auto,w=250";
+
+        // 🔥 short name (important)
+        const shortName = product.name.length > 40
+            ? product.name.substring(0, 40) + "..."
+            : product.name;
 
         card.innerHTML = `
-            <img src="${imageUrl}?f_auto,q_auto,w=400" loading="lazy" decoding="async">
+            <img src="${imageUrl}" loading="lazy">
+
             <div class="overlay"></div>
+
             <div class="content">
-                <div>${product.name}</div>
-                <div style="font-size:14px;">₹${product.price}</div>
+
+                <!-- SHORT NAME -->
+                <div style="font-size:12px;line-height:1.2;">
+                    ${shortName}
+                </div>
+
+                <!-- PRICE -->
+                <div style="margin-top:4px;">
+                    <span style="font-weight:bold;font-size:14px;">
+                        ₹${product.price}
+                    </span>
+
+                    <!-- SMALL DISCOUNT -->
+                    ${product.discount_percent ? `
+                    <span style="color:wheat;font-size:15px;margin-left:4px;">
+                        ${product.discount_percent}% OFF
+                    </span>
+                    ` : ""}
+                </div>
+
             </div>
         `;
         return card;
     }
 
     function addNewProductToTop(product) {
+
+        localStorage.removeItem(CACHE_KEY);
+
         if (document.querySelector(`[data-id="${product._id}"]`)) return;
 
         const card = createCard(product);
@@ -597,6 +554,8 @@
         const card = document.querySelector(`[data-id="${productId}"]`);
         if (card) card.remove();
     }
+
+    // ===== LOADER =====
     function showLoader(show) {
 
         let loader = document.getElementById("loader");
@@ -604,25 +563,19 @@
         if (!loader) {
             loader = document.createElement("div");
             loader.id = "loader";
-            loader.innerHTML = `<div class="loader-spinner"></div>`;
+            loader.innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                    <div style="height:180px;background:#ddd;border-radius:10px;"></div>
+                    <div style="height:180px;background:#ddd;border-radius:10px;"></div>
+                </div>
+            `;
             container.after(loader);
         }
 
-        loader.style.display = show ? "flex" : "none";
+        loader.style.display = show ? "block" : "none";
     }
 
-    function showNoMore() {
-
-        if (document.getElementById("endMsg")) return;
-
-        const msg = document.createElement("div");
-        msg.id = "endMsg";
-        msg.style.textAlign = "center";
-        msg.style.padding = "20px";
-        msg.style.fontWeight = "600";
-        container.after(msg);
-    }
-
+    // ===== ERROR =====
     function showError(message) {
         const msg = document.createElement("div");
         msg.style.textAlign = "center";
@@ -633,6 +586,7 @@
         container.after(msg);
     }
 
+    // ===== SCROLL =====
     const trigger = document.createElement("div");
     container.after(trigger);
 
@@ -644,11 +598,11 @@
 
     observer.observe(trigger);
 
+
     window.onload = () => {
         loadTshirts();
     };
 
 </script>
-
 </body>
 </html>

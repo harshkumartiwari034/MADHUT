@@ -16,4 +16,5 @@ class UserFetchOrder(MethodView):
         if not email:
             return {"message": "Unauthorized"}, 401
         order_data = self.order_db.fetch_all_order(email)
+
         return order_data

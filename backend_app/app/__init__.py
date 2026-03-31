@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from .User_Api import register_user_blueprint
 from .Admin_Api import register_admin_blueprint
@@ -13,6 +13,7 @@ import json
 import firebase_admin
 from firebase_admin import credentials
 from .extensions import cache
+from flask_compress import Compress
 
 
 # from .extensions import limiter
@@ -22,6 +23,7 @@ def create_app():
     app = Flask(__name__)
     bcrypt.init_app(app)
     configure_app(app)
+    Compress(app)
     # limiter.init_app(app)
 
     user_db = UserDatabase()
@@ -32,7 +34,7 @@ def create_app():
 
     @app.route("/ping")
     def ping():
-        return {"status": "ok"}, 200
+        return jsonify({"status": "ok"}), 200
 
     if not firebase_credentials:
         raise ValueError("FIREBASE_CREDENTIALS not set in environment")
@@ -57,7 +59,6 @@ def create_app():
         },
         supports_credentials=False
     )
-
     api.init_app(app)
     jwt.init_app(app)
     mail.init_app(app)

@@ -12,7 +12,7 @@ class FetchTshirt(MethodView):
     def __init__(self):
         self.tshirt_db = TshirtDatabase()
 
-    @cache.cached(timeout=60)
+    @cache.cached(timeout=60,query_string=True)
     def get(self):
         last_id = request.args.get('last_id')
         limit = int(request.args.get('limit', 20))

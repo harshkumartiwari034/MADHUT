@@ -27,14 +27,18 @@ class TshirtDatabase:
                 "image": image}
 
     def fetch_products(self, last_id=None, limit=20):
-
         query = {}
 
+        # safer handling
         if last_id:
             try:
-                query["_id"] = {"$gt": ObjectId(last_id)}
-            except:
-                query = {}
+                query["_id"] = {"$lt": ObjectId(last_id)}
+            except Exception:
+                return {
+                    "products": [],
+                    "has_more": False,
+                    "count": 0
+                }
 
         projection = {
             "name": 1,
@@ -47,20 +51,25 @@ class TshirtDatabase:
         cursor = (
             self.collection
             .find(query, projection)
-            .sort("_id", 1)
+            .sort("_id", -1)
             .limit(limit + 1)
         )
+
         products = list(cursor)
         has_more = len(products) > limit
 
         if has_more:
             products = products[:limit]
+
         for p in products:
             p["_id"] = str(p["_id"])
-        print(products)
+
+        next_cursor = products[-1]["_id"] if products else None
+
         return {
-            "products": products if products else [],
+            "products": products,
             "has_more": has_more,
+            "next_cursor": next_cursor,
             "count": len(products)
         }
 
